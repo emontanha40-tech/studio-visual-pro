@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "status": "initial-curated-knowledge-not-model-training",
+  "owner": "Eduardo Montanha",
+  "brand": "Studio Visual Pro",
+  "mission": "Transformar um briefing aprovado em uma campanha visual consistente, com controle editorial, técnico e comercial.",
+  "primaryAudience": ["Igrejas adventistas", "Pastores", "Distritos", "Departamentos", "Associações"],
+  "defaultArtDirection": {"tone": ["profissional", "claro", "contemporâneo"], "interface": ["azul petróleo", "areia", "acabamento fosco", "hierarquia", "espaço livre"]},
+  "campaignStyleRule": "Preferências da interface não devem restringir o estilo contratado pelo cliente.",
+  "nonNegotiable": [
+    "Nunca inventar datas, pessoas, locais, preços ou autorizações.",
+    "Não prometer 99,99% de acerto criativo.",
+    "Fotos de pessoas e logos oficiais preservados em camadas.",
+    "Texto e QR Code compostos de forma controlada.",
+    "Não apresentar mockups como arquivos prontos para gráfica.",
+    "Alteração do conteúdo gera revisão e nova aprovação.",
+    "Aprovação estética não substitui conferência editorial e técnica.",
+    "Usar apenas ativos com autorização documentada.",
+    "Dados de clientes não treinam modelos por padrão."
+  ],
+  "learningRecord": {"campaignId": "", "revisionId": "", "clientDecision": "approved|rejected|changes-requested", "reason": "", "scope": "client-only|licensed-general-pattern", "reviewer": "", "reviewedAt": ""}
+}

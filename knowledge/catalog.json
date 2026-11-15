@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "source": "src/engine.mjs — cópia documental; consolidar na fase 1",
+  "products": [
+    {
+      "id": "feed",
+      "name": "Feed",
+      "width": 1080,
+      "height": 1350,
+      "unit": "px",
+      "kind": "digital"
+    },
+    {
+      "id": "story",
+      "name": "Story",
+      "width": 1080,
+      "height": 1920,
+      "unit": "px",
+      "kind": "digital"
+    },
+    {
+      "id": "whatsapp",
+      "name": "WhatsApp",
+      "width": 1080,
+      "height": 1080,
+      "unit": "px",
+      "kind": "digital"
+    },
+    {
+      "id": "screen",
+      "name": "Telão",
+      "width": 1920,
+      "height": 1080,
+      "unit": "px",
+      "kind": "digital"
+    },
+    {
+      "id": "invitation",
+      "name": "Convite frente e verso",
+      "width": 100,
+      "height": 150,
+      "unit": "mm",
+      "kind": "print"
+    },
+    {
+      "id": "prayer",
+      "name": "Bloco de oração",
+      "width": 148,
+      "height": 210,
+      "unit": "mm",
+      "kind": "print"
+    },
+    {
+      "id": "decision",
+      "name": "Cartão de decisão",
+      "width": 148,
+      "height": 105,
+      "unit": "mm",
+      "kind": "print"
+    },
+    {
+      "id": "backdrop",
+      "name": "Backdrop",
+      "kind": "large-print"
+    },
+    {
+      "id": "wind",
+      "name": "Wind banner",
+      "kind": "large-print"
+    }
+  ]
+}

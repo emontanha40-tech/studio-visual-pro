@@ -1,0 +1,1 @@
+{"version":"2.0.0","tasks":[{"label":"Studio: iniciar laboratório","type":"shell","command":"npm start","problemMatcher":[]},{"label":"Studio: testar cérebro","type":"shell","command":"npm test","group":"test","problemMatcher":[]}]}

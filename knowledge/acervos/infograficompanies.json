@@ -1,0 +1,19 @@
+{
+  "id": "infograficompanies",
+  "versao": 1,
+  "tipo": "acervo-local-privado",
+  "proprietario": "Eduardo Montanha",
+  "data_inventario": "2026-11-15",
+  "status": "parcial",
+  "downloads_confirmados": 27,
+  "pptx_inspecionados": 35,
+  "slides_incluindo_variantes": 949,
+  "curso_inteiro_estudado": false,
+  "integracao_runtime": "nao_implementada",
+  "skill": ".agents/skills/usar-infograficompanies/SKILL.md",
+  "inventario": ".agents/skills/usar-infograficompanies/references/inventario.json",
+  "manifesto": ".agents/skills/usar-infograficompanies/references/downloads-confirmados.json",
+  "originais": "acervo-local/infograficompanies/originais",
+  "redistribuicao_dos_originais": false,
+  "observacao": "Índice para agentes. Não carrega os materiais no painel e não amplia a licença do fornecedor."
+}

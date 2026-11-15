@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "steps": [
+    {"id":"intent","questions":["Qual ação o público deve tomar?","Quem é o público principal?","Qual mensagem deve ser lembrada?"]},
+    {"id":"scope","questions":["Quais produtos e quantas versões?","Criação apenas ou impressão também?","Qual prazo e faixa de investimento?","Editáveis são necessários?"]},
+    {"id":"visual","questions":["Quais três referências representam o desejo?","O que agrada em cada referência?","O que deve ser evitado?","Pode representar Jesus ou elementos proféticos?","Há paleta, fonte ou campanha oficial a respeitar?"]},
+    {"id":"assets","questions":["Há fotos originais em boa resolução?","Quais logos oficiais e assinaturas?","Quem autoriza seu uso?","Existe manual de marca?"]},
+    {"id":"content","questions":["Tema e subtítulo exatos?","Datas e horários por dia?","Local completo?","Nomes e funções?","Contatos e URL?","Texto bíblico e tradução?"]},
+    {"id":"print","when":"any product.kind includes print","questions":["Qual gráfica e gabarito?","Tamanho final e escala?","Material, sangria, área segura e perfil de cor?","Há costura, dobra ou recorte?"]},
+    {"id":"approval","questions":["Quem aprova pela organização?","Quem valida conteúdo?","Quantas rodadas estão contratadas?"]}
+  ],
+  "contradictions": [
+    {"signal":"Minimalismo com muitas fotos e muito texto","response":"Propor peça principal simples e complemento em carrossel/programação."},
+    {"signal":"Backdrop solicitado sem medidas","response":"Pedir gabarito antes de liberar produção."},
+    {"signal":"Alterar data após aprovação","response":"Criar revisão, atualizar peças e solicitar nova conferência."},
+    {"signal":"Pedido de cópia de campanha existente","response":"Confirmar autorização e escopo de adaptação antes de usar ativos."}
+  ]
+}
