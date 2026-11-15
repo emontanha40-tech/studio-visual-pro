@@ -9,10 +9,13 @@
 
 ## Estado atualizado em 15/11/2026 (após inicialização do Git)
 - Repositório Git local criado: `studio-visual-pro`
-- Arquivos adicionados: código principal, interface do usuário, testes, documentação
-- Excluído do histórico: acervo comprado (~163 MB), dados privados, segredos
-- 21 testes automatizados (17 domínio + 4 API) ainda aprovados
+- Arquivos adicionados: código principal, interface do usuário, testes, documentação, skills e docs necessários
+- Excluído do histórico: acervo comprado (~163 MB), dados privados, segredos, arquivos temporários "node" e "studio-visual-pro@0.1.0" (sem evidência de backup)
+- 21 testes automatizados (17 domínio + 4 API) ainda aprovados conforme execução anterior
 - Proteção embutida: .gitignore cobre acervo-local/, .env, dados privados
+
+## Incidente recente
+Em 15/11/2026, arquivos temporários "node" e "studio-visual-pro@0.1.0" foram removidos durante operação. Nenhuma evidência de backup externo registrada. Recuperação impossível por não terem sido rastreados.
 
 ## Tarefa atual
 Preparar o ambiente compartilhado de instruções, progresso e passagem entre ferramentas.

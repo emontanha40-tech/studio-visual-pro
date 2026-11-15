@@ -5,6 +5,7 @@
 - Confirme diretório, branch e alterações locais. Não presuma que o nome do terminal protege o ambiente.
 - Não altere outros projetos, configurações globais do Git ou arquivos do usuário.
 - Trabalhe em ambiente de desenvolvimento. Não publique, cobre ou emita documentos fiscais sem escopo explícito para essa ação.
+- **Proibido:** git clean -d, reset --hard, merge --abort, checkout . (ou equivalente) sem autorização explícita do proprietário. Operações destrutivas requerem revisão e aprovação específica.
 
 ## Honestidade de produto
 - Identifique templates demonstrativos e integrações desconectadas na interface.
