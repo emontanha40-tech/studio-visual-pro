@@ -1,14 +1,29 @@
 # Progresso — Studio Visual Pro
 
-## Tentativa de backup remoto em 15/11/2026
+## Tentativa de backup remoto em 15/11/2026 (STATUS CORRIGIDO)
 - **OBJETIVO**: criar backup privado remoto em `emontanha40-tech/studio-visual-pro`
-- **RESULTADO**: **FALHOU** - sem conectividade de rede para GitHub
-- **ERROR**: "check your internet connection or https://githubstatus.com"
-- **STATUS**: Falha de conectividade de rede impedindo criação/repositório remoto
-- **COMMIT APÓS TENTATIVA**: criado com sucesso (1026b78)
-- **PUSH APÓS COMMIT**: **FALHOU** - sem conectividade com GitHub
-- **LOCAL**: branch main (hash: `502a60cd465009818389dec67e1d8038ba6757d7`)
-- **REMOTO**: não pode ser acessado devido a falha de rede
+- **RESULTADO**: **CONCLUÍDO** - **repositório já existia**
+- **PRIVACIDADE**: confirmada como `isPrivate=true`
+- **PUSH**: **CONCLUÍDO** - branch main enviada com sucesso
+- **HASHES VERIFICADOS**: local e remoto correspondem (`502a60cd465009818389dec67e1d8038ba6757d7`)
+- **NOTA**: Sem evidência de falta de internet neste terminal específico
+
+## Backup do código confirmado no commit 502a60cd465009818389dec67e1d8038ba6757d7
+- **Hash remoto**: `502a60cd465009818389dec67e1d8038ba6757d7`
+- **Status**: **CÓDIGO CONFIRMADO** no repositório remoto
+- **Privacidade**: **confirmada** como privado
+- **Branch**: `main` enviado com sucesso
+- **Verification**: Hash local corresponde ao remoto
+
+## Alterações posteriores que ainda possam estar apenas no Mac
+- **Status**: **DIFERENÇA POTENCIAL** entre commit local e remoto após 502a60cd465009818389dec67e1d8038ba6757d7
+- **Ação recomendada**: Verificar diferenças no Git de qualquer terminal que possa ter alterações não enviadas
+- **Nota**: Sem referência específica a isso no terminal atual
+
+## Acervo comprado, fora do Git e ainda sem backup separado confirmado
+- **Status**: **AINDA SEM BACKUP** para acervo comprado (~163 MB)
+- **Localização**: `acervo-local/infograficompanies/` (ignorada por .gitignore)
+- **Próxima etapa**: Backup separado exigido para acervo comprado
 
 ## Estado confirmado em 15/11/2026
 - Projeto local v0.1 em desenvolvimento, sem repositório Git detectado na conferência inicial.
