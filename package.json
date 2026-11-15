@@ -4,6 +4,12 @@
   "private": true,
   "type": "module",
   "description": "Laboratório local do Studio Visual Pro: briefing, aprovações e prévias estruturais.",
-  "engines": { "node": ">=22" },
-  "scripts": { "start": "node server.mjs", "test": "node --test", "check": "node --check server.mjs && node --check src/engine.mjs && node --check public/app.mjs" }
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node --test",
+    "check": "node --check server.mjs && node --check src/engine.mjs && node --check public/app.mjs && node --check src/acervo-catalogo.mjs && node --check public/acervo.mjs"
+  }
 }

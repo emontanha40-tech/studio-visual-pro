@@ -36,7 +36,7 @@ O servidor escuta somente em 127.0.0.1. Não use túnel público, não faça dep
 - Aprovações por revisão, histórico em memória e invalidação de aprovações.
 - Exportação do projeto, prompt de briefing e especificação de produção.
 - Rascunho local opcional; ao recarregar, aprovações precisam ser refeitas.
-- 21 testes automatizados (17 do núcleo e 4 HTTP), sem bibliotecas externas.
+- 30 testes automatizados (17 do núcleo, 5 HTTP e 8 de catálogo/interface), sem bibliotecas externas.
 
 ## Limites explícitos
 
@@ -68,3 +68,11 @@ O servidor escuta somente em 127.0.0.1. Não use túnel público, não faça dep
 Edite knowledge e prompts com exemplos **autorizados**, registrando motivo da aprovação/rejeição. A alteração desses arquivos ainda não muda automaticamente o painel. O primeiro trabalho do próximo ciclo será conectar essa base ao orquestrador no servidor, com validação de schema e testes. Não confunda arquivo de conhecimento com modelo treinado.
 
 O projeto não inclui as artes de referência anexadas nem marcas oficiais: é necessário verificar licença antes de incorporá-las ao acervo comercial.
+
+## Consulta ao acervo
+
+A seção **Acervo** permite pesquisar por nome e categoria (por exemplo, calendários, ecologia ou gráficos), sem acessar os arquivos originais. Mostra 27 downloads catalogados, 35 apresentações PPTX e um arquivo PPT legado, em 36 entradas contando versões e variantes. Quantidades desconhecidas são indicadas como não informadas. Categorias são organizadas pelo nome do modelo; isso não comprova compatibilidade com outro editor.
+
+O servidor lê o inventário local e entrega somente metadados permitidos em `/api/acervo`. O inventário bruto, os textos extraídos e os originais não têm rotas públicas. Edição, prévia, importação e download de apresentações não estão implementados. O catálogo funciona com os JSONs versionados; não requer originais comprados para esta consulta.
+
+Teste manual: execute `npm start`, abra http://127.0.0.1:4173/#acervo, pesquise `calendarios`, depois um termo inexistente e limpe a busca. Confira que o briefing continua funcionando. Se os JSONs do inventário estiverem ausentes ou inválidos, a interface informa a falha e oferece nova tentativa.

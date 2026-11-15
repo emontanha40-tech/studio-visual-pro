@@ -1,7 +1,7 @@
 # Arquitetura e limites
 
 ## Hoje: laboratório local
-Navegador → engine.mjs → estado em memória → exportação JSON. Rascunho opt-in no localStorage, sem aprovações. server.mjs apenas serve quatro rotas estáticas por loopback. Sem dependências npm e sem chamadas externas. Knowledge e prompts são insumos documentados para o próximo ciclo, não executados automaticamente.
+Navegador → engine.mjs → estado em memória → exportação JSON. Rascunho opt-in no localStorage, sem aprovações. server.mjs serve rotas estáticas explicitamente permitidas por loopback e `/api/acervo`, uma projeção dos metadados do inventário. O inventário bruto e os originais permanecem sem rotas públicas. Sem dependências npm e sem chamadas externas. Knowledge e prompts são insumos documentados para o próximo ciclo, não executados automaticamente.
 
 ## Alvo: monólito modular e worker
 Portal cliente/admin → API autenticada → módulos de projeto/aprovação/comercial → banco relacional e armazenamento privado. Worker separado para geração, composição, QA e exportação. Começar com poucos serviços; não criar microserviços por estética arquitetural.

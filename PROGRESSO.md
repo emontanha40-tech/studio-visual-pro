@@ -1,5 +1,19 @@
 # Progresso — Studio Visual Pro
 
+## Consulta ao catálogo — 15/11/2026
+- Correção sobre a implementação local existente no commit 466ba88: removida falha de sintaxe, busca duplicada, acesso ao inventário bruto e interpolação de dados como HTML.
+- Seção Acervo com busca por nome ou categoria, preservação do campo, quantidade desconhecida, ausência de resultados, erro de carregamento e nova tentativa.
+- Servidor acrescenta apenas `/api/acervo` para metadados permitidos e `/acervo.mjs` para o comportamento da busca. Nenhuma rota serve originais ou inventário bruto.
+- Contagem: 27 downloads catalogados, 35 PPTX e um PPT legado, 36 entradas incluindo versões e variantes. Não são 36 modelos únicos certificados.
+- Verificação isolada: 25 testes passaram e npm run check passou. Os testes HTTP reais foram impedidos pela restrição de abrir porta local nesta sessão; nenhum teste foi removido ou marcado para pular.
+- Validação na aplicação pelo S01: npm test e npm run check passaram antes do commit. Conferência visual no navegador ainda pendente.
+- Homologação visual no navegador pendente: abrir http://127.0.0.1:4173/#acervo após npm start; buscar calendarios, um termo inexistente e limpar a busca; conferir o fluxo de briefing.
+- Sem novas dependências, serviços externos, alterações nos originais ou push nesta missão.
+- Backup do código anterior confirmado pelo proprietário; acervo original continua exigindo backup separado.
+
+### Registros anteriores
+Os registros abaixo preservam o histórico de preparação; o estado da consulta ao catálogo é o desta seção.
+
 ## Tentativa de backup remoto em 15/11/2026 (STATUS CORRIGIDO)
 - **OBJETIVO**: criar backup privado remoto em `emontanha40-tech/studio-visual-pro`
 - **RESULTADO**: **CONCLUÍDO** - **repositório já existia**
@@ -28,7 +42,7 @@
 ## Estado confirmado em 15/11/2026
 - Projeto local v0.1 em desenvolvimento, sem repositório Git detectado na conferência inicial.
 - Acervo Infograficompanies instalado: 27 downloads e habilidade em .agents/skills/usar-infograficompanies/SKILL.md.
-- Índice de descoberta em knowledge/acervos/infograficompanies.json. Integração automática do acervo com o painel ainda não implementada.
+- Índice de descoberta em knowledge/acervos/infograficompanies.json. Consulta de metadados do acervo integrada ao painel; edição/importação de apresentações ainda não implementadas.
 - Último resultado informado pelo proprietário: 21 testes aprovados e verificação de sintaxe concluída após instalar o acervo. Conferir novamente antes de mudar o código.
 - OpenCode disponível. Modelo local apresentou lentidão; conexão e modelo OpenRouter ainda precisam ser confirmados pelo proprietário. Nenhuma credencial ou limite de gasto está registrado neste arquivo.
 
@@ -43,7 +57,7 @@
 Em 15/11/2026, arquivos temporários "node" e "studio-visual-pro@0.1.0" foram removidos durante operação. Nenhuma evidência de backup externo registrada. Recuperação impossível por não terem sido rastreados.
 
 ## Tarefa atual
-Preparar o ambiente compartilhado de instruções, progresso e passagem entre ferramentas.
+Consultar o catálogo no painel e homologar a busca em navegador local.
 
 ## Próximo passo pequeno
 Diagnosticar a situação de Git e planejar um checkpoint seguro antes de modificar o produto. Conferir .gitignore e procurar segredos por nomes e categorias, sem imprimir valores. Não inicializar Git, criar commit ou remoto sem autorização específica. Depois, selecionar um único fluxo de consulta ao catálogo para implementar.
