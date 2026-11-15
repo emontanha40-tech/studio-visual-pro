@@ -1,5 +1,77 @@
 import {CATALOG,DIRECTIONS,FIELD_LABELS,createProject,validate,missingContent,updateBrief,approve,chooseDirection,hasApproval,productionPlan,buildPrompt,restoreDraft,conceptSVG} from '/engine.mjs';
+
+// Load acervo inventory data for catalog search
+let acervoData = [];
+let acervoLoaded = false;
+let acervoLoading = false;
+async function loadAcervoData() {
+  if (acervoLoaded) return;
+  if (acervoLoading) return new Promise(resolve => {
+    const check = setInterval(() => {
+      if (!acervoLoading) {
+        clearInterval(check);
+        resolve();
+      }
+    }, 100);
+  });
+  
+  acervoLoading = true;
+  try {
+    // Load inventory data using the existing skill file reference
+    const response = await fetch('/.agents/skills/usar-infograficompanies/references/inventario.json');
+    if (!response.ok) throw new Error('Falha ao carregar acervo');
+    acervoData = await response.json();
+    acervoLoaded = true;
+  } catch (error) {
+    console.error('Erro ao carregar acervo:', error);
+    acervoData = [];
+    acervoLoaded = true; // Mark as loaded to avoid repeated attempts
+  } finally {
+    acervoLoading = false;
+  }
+}
 const $=s=>document.querySelector(s); let project=createProject(); const urls=[];
+
+// Search functionality for acervo catalog
+let searchQuery = '';
+let searchResults = [];
+let acervoSearchLoading = false;
+function performAcervoSearch(query) {
+  searchQuery = query.toLowerCase().trim();
+  if (!query) {
+    searchResults = [];
+    return;
+  }
+  
+  acervoSearchLoading = true;
+  try {
+    // Filter acervoData based on search query
+    if (acervoLoaded && acervoData.length > 0) {
+      searchResults = acervoData.filter(item => {
+        const arquivo = item.arquivo || '';
+        const apresentacao = item.apresentacao || '';
+        const slides = item.slides ? String(item.slides) : '';
+        const fontes = item.fontes ? JSON.stringify(item.fontes) : '';
+        const amostraTextos = item.amostra_textos ? item.amostra_textos.join(' ') : '';
+        
+        const searchFields = [
+          arquivo,
+          apresentacao,
+          slides,
+          fontes,
+          amostraTextos
+        ].join(' ').toLowerCase();
+        
+        return searchFields.includes(searchQuery);
+      });
+    }
+  } catch (error) {
+    console.error('Erro ao pesquisar acervo:', error);
+    searchResults = [];
+  } finally {
+    acervoSearchLoading = false;
+  }
+}
 function message(s){$('#message').textContent=s;}
 function node(tag,text,className){const el=document.createElement(tag);if(text!==undefined)el.textContent=text;if(className)el.className=className;return el;}
 function download(name,content,type='application/json'){const url=URL.createObjectURL(new Blob([content],{type}));const a=node('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
@@ -34,6 +106,94 @@ function render(){
     const btn=node('button','Aprovar '+label.toLowerCase());btn.disabled=hasApproval(project,stage);btn.onclick=()=>action(()=>{ensureApplied();project=approve(project,stage,project.brief.approver);message(label+' aprovado no laboratório local.');});card.append(btn);$('#approvals').append(card);
   }
   $('#history').replaceChildren(...project.history.map(h=>node('li',`R${h.revision} · ${new Date(h.at).toLocaleString('pt-BR')} · ${h.action} · ${h.actor}`)));
+
+  // Acervo search section
+  $('#acervo-section').replaceChildren();
+  
+  // Search input
+  const searchContainer = node('div', undefined, 'acervo-search-container');
+  const searchInput = node('input');
+  searchInput.type = 'text';
+  searchInput.placeholder = 'Pesquisar por nome, tema, slides ou conteúdo...';
+  searchInput.className = 'acervo-search-input';
+  searchInput.oninput = (e) => {
+    performAcervoSearch(e.target.value);
+    render();
+  };
+  
+  const searchButton = node('button', 'Pesquisar');
+  searchButton.className = 'acervo-search-button';
+  searchButton.onclick = () => performAcervoSearch(searchInput.value);
+  
+  searchContainer.append(searchInput, searchButton);
+  $('#acervo-section').append(searchContainer);
+  
+  // Loading indicator
+  if (acervoSearchLoading) {
+    $('#acervo-section').append(node('div', 'Carregando acervo...', 'acervo-loading'));
+  }
+  
+  // Search results
+  if (searchQuery && searchResults.length > 0) {
+    const resultsContainer = node('div', undefined, 'acervo-results');
+    resultsContainer.innerHTML = `<h3>Resultados da busca por "<strong>${searchQuery}</strong>": ${searchResults.length} itens encontrados</h3>`;
+    
+    searchResults.forEach((item, index) => {
+      const resultCard = node('div', undefined, 'acervo-result-card');
+      const title = item.arquivo || item.apresentacao || 'Sem título';
+      const slides = item.slides ? `${item.slides} slide${item.slides !== 1 ? 's' : ''}` : 'Slides: não especificado';
+      const categories = [];
+      
+      // Extract categories from the item
+      if (item.apresentacao && item.apresentacao.includes('Google Slides')) categories.push('Google Slides');
+      if (item.apresentacao && item.apresentacao.includes('PowerPoint')) categories.push('PowerPoint');
+      if (item.apresentacao && item.apresentacao.includes('PPT legacy')) categories.push('PPT Legacy');
+      
+      const fonteInfo = item.fontes ? Object.keys(item.fontes).length : 0;
+      const amostraPreview = item.amostra_textos && item.amostra_textos.length > 0 ? item.amostra_textos[0].substring(0, 150) + '...' : 'Sem prévia de texto';
+      
+      resultCard.innerHTML = `
+        <h4>${title}</h4>
+        <div class="acervo-result-meta">
+          <span class="acervo-badge">${slides}</span>
+          ${categories.length > 0 ? `<span class="acervo-badge">${categories.join(', ')}</span>` : ''}
+          <span class="acervo-badge">${fonteInfo} fontes</span>
+          ${item.slides_com_animacao ? `<span class="acervo-badge">${item.slides_com_animacao} animados</span>` : ''}
+        </div>
+        <div class="acervo-result-preview">
+          <strong>Prévia do conteúdo:</strong> ${amostraPreview}
+        </div>
+        <div class="acervo-result-details">
+          <strong>Arquivo:</strong> ${item.arquivo || 'N/A'}<br>
+          <strong>Apresentação:</strong> ${item.apresentacao || 'N/A'}<br>
+          <strong>Slides animados:</strong> ${item.slides_com_animacao || 0}<br>
+          <strong>Formas nativas:</strong> ${item.formas_nativas || 0}<br>
+          <strong>Gráficos nativos:</strong> ${item.graficos_nativos || 0}<br>
+          <strong>Tabelas nativas:</strong> ${item.tabelas_nativas || 0}
+        </div>
+      `;
+      
+      resultsContainer.appendChild(resultCard);
+    });
+    
+    $('#acervo-section').append(resultsContainer);
+  }
+  
+  // Empty search state
+  if (searchQuery && searchResults.length === 0 && !acervoSearchLoading) {
+    $('#acervo-section').append(node('div', `Nenhum resultado encontrado para "${searchQuery}". Tente palavras-chave diferentes ou verifique a ortografia.`, 'acervo-empty'));
+  }
+  
+  // Initial loading state
+  if (!acervoLoaded && !acervoSearchLoading) {
+    $('#acervo-section').append(node('div', 'Carregando acervo... Clique em Pesquisar para carregar o inventário.', 'acervo-loading'));
+  }
+  
+  // Error state
+  if (searchQuery && acervoSearchLoading) {
+    $('#acervo-section').append(node('div', 'Erro ao carregar acervo. Tente novamente.', 'acervo-error'));
+  }
+}
 }
 function formBrief(){const f=new FormData($('#brief-form'));return {...Object.fromEntries(Object.keys(FIELD_LABELS).map(k=>[k,String(f.get(k)||'')])),products:f.getAll('products'),rightsConfirmed:f.has('rightsConfirmed')};}
 function ensureApplied(){if(JSON.stringify(formBrief())!==JSON.stringify(project.brief))throw new Error('Existem alterações no formulário. Clique em “Aplicar alterações ao briefing” antes de avançar.');}

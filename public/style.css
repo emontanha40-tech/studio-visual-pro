@@ -1,1 +1,121 @@
 :root{--ink:#18333c;--muted:#627478;--line:#dce2de;--paper:#f3f3ee;--gold:#b59b69}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.6 system-ui,sans-serif}aside{width:240px;position:fixed;inset:0 auto 0 0;background:#142e37;color:#edf0e9;padding:42px 28px}.brand{font-size:45px;font-weight:700;letter-spacing:-3px;color:inherit;text-decoration:none}.brand span{color:#c1ad82}.brand small{display:block;font-size:10px;letter-spacing:2px;margin-top:6px}.aside-label{font-size:9px;letter-spacing:1.5px;color:#a3b4b7;margin-top:65px}nav a{display:block;color:#d9e4e4;text-decoration:none;padding:14px 0;border-bottom:1px solid #35505a}.aside-footer{position:absolute;bottom:30px;font-size:12px;color:#99afb3}main{margin-left:240px;padding:46px 5vw;max-width:1500px}header{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;margin-bottom:30px}.eyebrow{font-size:10px;letter-spacing:2px;font-weight:700;color:#887653}h1{font-size:clamp(32px,4vw,52px);line-height:1.1;letter-spacing:-2px;margin:18px 0}h2{font-size:25px;letter-spacing:-.7px;line-height:1.3;margin:6px 0 16px}h3{font-size:16px}p{color:var(--muted)}.badge{font-size:10px;letter-spacing:1px;white-space:nowrap;border:1px solid #b4c1bf;border-radius:20px;padding:8px 12px}.notice{padding:16px 20px;border-left:3px solid var(--gold);background:#e9e7de;font-size:13px;color:#515a56}.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:22px 0}button{font:inherit;cursor:pointer;padding:10px 16px;border:1px solid #c2cecb;border-radius:6px;color:var(--ink);background:#fff}button:hover{background:#e9eeeb}button:focus-visible,input:focus-visible,textarea:focus-visible,a:focus-visible{outline:3px solid #ab8a4c;outline-offset:3px}button:disabled{opacity:.5;cursor:not-allowed}.primary{background:var(--ink);color:#fff;border-color:var(--ink)}.primary:hover{background:#2d4b54}.quiet{background:transparent}section{padding:30px;background:#fff;border:1px solid var(--line);border-radius:10px;margin:24px 0;scroll-margin-top:16px}.section-head{display:flex;align-items:center;justify-content:space-between;gap:16px}.fields{display:grid;grid-template-columns:1fr 1fr;gap:18px}.fields label{font-size:13px;font-weight:600}.fields input,.fields textarea{display:block;width:100%;margin-top:7px;border:1px solid #cbd4d0;border-radius:5px;padding:11px;font:inherit;color:var(--ink);background:#fcfcfa}.fields textarea{min-height:85px;resize:vertical}.products{display:flex;gap:10px;flex-wrap:wrap}.products label{border:1px solid var(--line);padding:8px 12px;border-radius:6px;font-size:13px}.check{display:block;margin:22px 0;font-size:13px}.hint{font-size:12px}.concepts{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:24px}.concept{border:1px solid var(--line);border-radius:8px;overflow:hidden;padding-bottom:18px}.concept.selected{outline:3px solid var(--gold)}.concept img{display:block;width:100%;aspect-ratio:4/5}.concept h3,.concept p,.concept button{margin:12px 16px}.concept p{font-size:12px}.approval-grid,.integration-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.approval-grid>div,.integration-grid>div{padding:16px;background:#f0f3ef;border-radius:6px;font-size:12px}.approval-grid strong,.integration-grid strong{display:block;margin-bottom:12px}.approval-grid button{font-size:12px;padding:7px}.integration-grid{margin:26px 0}.integration-grid strong{margin-top:8px;color:#7b6c50}#message{min-height:24px;white-space:pre-line}#validation{font-size:13px}.errors{color:#9a3e32}.warnings{color:#80652b}.ok{color:#29634d}details{font-size:13px}footer{font-size:12px;color:var(--muted);text-align:center;margin:40px 0}@media(max-width:1100px){aside{width:190px;padding:30px 20px}main{margin-left:190px;padding:32px 25px}.approval-grid,.integration-grid{grid-template-columns:1fr 1fr}}@media(max-width:760px){aside{position:static;width:auto;padding:18px 22px}.brand{font-size:28px}.brand small{display:inline;font-size:9px;margin-left:20px}.aside-label,.aside-footer,nav{display:none}main{margin:0;padding:24px 16px}header{display:block}header>.badge{display:inline-block;margin-top:10px}.fields,.concepts{grid-template-columns:1fr}section{padding:22px 16px}.concepts{max-width:480px;margin:auto}.approval-grid,.integration-grid{grid-template-columns:1fr 1fr}.section-head{align-items:flex-start}h1{letter-spacing:-1px}.toolbar button{flex-grow:1}}
+
+/* Acervo search styles */
+.acervo-search-container {
+  display: flex;
+  gap: 10px;
+  margin: 20px 0;
+  max-width: 600px;
+}
+
+.acervo-search-input {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid #c2cecb;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.acervo-search-button {
+  padding: 10px 16px;
+  background: var(--ink);
+  color: white;
+  border: 1px solid var(--ink);
+}
+
+.acervo-search-button:hover {
+  background: #2d4b54;
+}
+
+.acervo-results {
+  margin-top: 20px;
+}
+
+.acervo-results h3 {
+  margin-bottom: 15px;
+  color: var(--ink);
+  font-size: 18px;
+}
+
+.acervo-result-card {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 15px;
+  background: #fafaf8;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.acervo-result-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.acervo-result-card h4 {
+  margin: 0 0 12px 0;
+  color: var(--ink);
+  font-size: 16px;
+}
+
+.acervo-result-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.acervo-badge {
+  background: #e9eeeb;
+  color: var(--muted);
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  border: 1px solid var(--line);
+}
+
+.acervo-result-preview {
+  margin: 16px 0;
+  padding: 12px;
+  background: white;
+  border-left: 3px solid var(--gold);
+  font-size: 13px;
+  color: var(--muted);
+  font-style: italic;
+}
+
+.acervo-result-details {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+  font-size: 13px;
+}
+
+.acervo-result-details strong {
+  color: var(--ink);
+}
+
+.acervo-loading,
+.acervo-empty,
+.acervo-error {
+  padding: 20px;
+  border-radius: 6px;
+  margin: 20px 0;
+  text-align: center;
+}
+
+.acervo-loading {
+  background: #e9eeeb;
+  color: var(--muted);
+}
+
+.acervo-empty {
+  background: #fff3f3;
+  color: #d63031;
+  border: 1px solid #ffe3e3;
+}
+
+.acervo-error {
+  background: #fff8e6;
+  color: #fdcb6e;
+  border: 1px solid #ffedcc;
+}
