@@ -1,0 +1,11 @@
+node_modules/
+.env
+.env.*
+!.env.example
+data/
+exports/
+*.log
+.DS_Store
+
+# Acervo comprado: arquivos locais privados
+/acervo-local/infograficompanies/
