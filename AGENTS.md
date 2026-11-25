@@ -65,3 +65,41 @@
 - Consultar o acervo local somente quando relevante. Não carregar centenas de arquivos no contexto. Não publicar os templates adquiridos.
 - Não mudar de conversa por rotina a cada comando. Ao mudar de tarefa independente, fazer checkpoint e conferir os comandos de contexto disponíveis na ferramenta utilizada.
 <!-- /metodo-trabalho-agentes-v1 -->
+
+<!-- ambiente-comum-agentes-20261115 -->
+## Método comum e continuidade
+
+- Ler `docs/METODO-AGENTES.md`, `docs/CONTEXTO-AGENTES.md` e `PROGRESSO.md` ao assumir uma missão.
+- Preservar todas as regras específicas anteriores; esta inclusão não amplia permissões, acesso a dados ou escopo operacional.
+- Usar o terminal S01 conforme AGENTS.md. O acervo comprado é referência interna para o motor criativo produzir kits consistentes; um catálogo público não é prioridade. Preservar a implementação atual até missão específica. Não copiar a habilidade ou os originais para outros projetos.
+<!-- /ambiente-comum-agentes-20261115 -->
+
+<!-- direcao-produtos-20261115 -->
+## Produtos e dados dos clientes
+
+- Ler `docs/DIRECAO-PRODUTOS.md` antes de propor reaproveitamento de IA, WhatsApp, agenda ou integrações entre produtos.
+- CRM é separado; reutilizar tecnologia não autoriza copiar dados ou credenciais do proprietário. Preservar a integração existente de WhatsApp, web e app.
+- Comercialização e isolamento por cliente são requisitos a verificar, não capacidades garantidas por estas instruções.
+<!-- /direcao-produtos-20261115 -->
+
+<!-- roteiro-pdf-ambiente-v1 -->
+## Continuidade do roteiro do PDF
+
+- Usar `docs/ROTEIRO-PDF.md` para distinguir instruções instaladas de recuperação, backup, segurança, custos e homologação realmente comprovados.
+- Consultar as evidências existentes e avançar uma pendência concreta por vez; não repetir diagnósticos genéricos nem reconstruir integrações que o proprietário já usa.
+<!-- /roteiro-pdf-ambiente-v1 -->
+
+<!-- rotina-terminal-agentes-v1 -->
+# Rotina de trabalho — instruções comuns
+
+- Responder em português do Brasil. Antes de agir, confirmar projeto, pasta e ambiente e ler o progresso e as regras específicas. Não misturar dados ou permissões de projetos diferentes.
+- Trabalhar com Objetivo, Visto, Limite e Pronto quando. Planejar brevemente na mesma conversa e executar a missão autorizada até o resultado verificável. Não pedir reaprovação de leituras e tarefas rotineiras já autorizadas.
+- Preservar arquivos, alterações e integrações existentes. Não apagar, limpar Git, trocar branch, migrar dados, enviar mensagens, publicar ou ativar custos fora do escopo. Guardião e demais proteções continuam obrigatórios. Não inventar comandos faltantes como novas pendências.
+- Fazer uma tarefa por vez. Anotar ideias em IDEIAS.md sem iniciar novas frentes. Manter conversas separadas por projeto e preservar contexto de tarefas dependentes.
+- Usar evidências do código e registros existentes. Não repetir diagnósticos ou testes já suficientes sem mudança, falha nova ou dúvida concreta. Rodar verificações adequadas quando a alteração exigir. Distinguir testes atuais, resultados anteriores e homologação humana.
+- Ajustar o esforço ao tamanho da tarefa. Não carregar todo o repositório, gerar relatórios longos ou iniciar subagentes por rotina. Verificar modelo e custo no provedor; não prometer custo zero, velocidade, qualidade ou saldo sem evidência.
+- Atualizar PROGRESSO.md no fechamento de uma etapa: objetivo, mudanças, verificações, limitações e próximo passo. Commit e push dependem da autorização e das regras locais. Revisão independente antes de produção ou mudanças relevantes.
+- Trabalhar diretamente neste projeto, sem depender de outro chat para cada comando. Perguntar apenas por informação essencial ausente ou ação sensível fora do escopo. Uma regra carregada não comprova que foi obedecida; apresentar evidências ao concluir.
+
+Consultar docs/METODO-AGENTES.md e docs/ROTEIRO-PDF.md quando necessário. Não tratar instruções instaladas como comprovação de backup, isolamento entre clientes, segurança ou produto pronto.
+<!-- /rotina-terminal-agentes-v1 -->

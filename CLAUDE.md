@@ -1,1 +1,7 @@
 @AGENTS.md
+
+@docs/ROTINA-TRABALHO.md
+
+@docs/CONTEXTO-AGENTES.md
+
+@PROGRESSO.md
