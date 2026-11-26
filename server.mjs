@@ -6,6 +6,11 @@ import { CampaignQueue } from './src/queues/campaignQueue.ts';
 import { createMediaProvider } from './src/services/ai-media/index.ts';
 
 const port = Number(process.env.PORT || 4173);
+const bindHost = process.env.BIND_HOST || '127.0.0.1';
+const extraHosts = (process.env.ALLOWED_HOSTS || '')
+  .split(',')
+  .map((h) => h.trim())
+  .filter(Boolean);
 const MAX_BODY_BYTES = 64 * 1024;
 
 const routes = new Map([
@@ -63,7 +68,7 @@ export function createServer({ lerAcervo = carregarAcervo, campaignQueue = null 
   let activeQueue = campaignQueue ?? null;
 
   return http.createServer(async (req, res) => {
-    const allowedHosts = [`127.0.0.1:${port}`, `localhost:${port}`];
+    const allowedHosts = [`127.0.0.1:${port}`, `localhost:${port}`, ...extraHosts];
     if (!allowedHosts.includes(req.headers.host)) {
       res.writeHead(403);
       res.end('Host recusado');
@@ -142,9 +147,9 @@ export function createServer({ lerAcervo = carregarAcervo, campaignQueue = null 
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  createServer().listen(port, '127.0.0.1', () =>
+  createServer().listen(port, bindHost, () =>
     console.log(
-      `Studio Visual Pro • laboratório local: http://127.0.0.1:${port}\nPreview de campanha: http://127.0.0.1:${port}/showcase\nCtrl+C encerra.`,
+      `Studio Visual Pro • ativo em: http://${bindHost}:${port}\nPreview de campanha: http://${bindHost}:${port}/showcase\nCtrl+C encerra.`,
     ),
   );
 }
