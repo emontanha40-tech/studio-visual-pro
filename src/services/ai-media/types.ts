@@ -16,6 +16,14 @@ export interface TypographyArtRequest {
   seed?: number;
 }
 
+export interface ProductCompositionRequest {
+  prompt: string;
+  aspectRatio: AspectRatio;
+  referenceImageUrl?: string;
+  negativePrompt?: string;
+  seed?: number;
+}
+
 export interface UpscaleRequest {
   imageUrl: string;
   scaleFactor?: 2 | 4;
@@ -50,6 +58,7 @@ export interface MediaProvider {
   readonly name: string;
   generateKeyVisual(req: KeyVisualRequest): Promise<MediaGenerationResult>;
   generateTypographyArt(req: TypographyArtRequest): Promise<MediaGenerationResult>;
+  composeProductVisual(req: ProductCompositionRequest): Promise<MediaGenerationResult>;
   upscaleForPrint(req: UpscaleRequest): Promise<MediaGenerationResult>;
   animateTeaser(req: VideoAnimationRequest): Promise<MediaGenerationResult>;
 }

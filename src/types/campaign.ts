@@ -14,10 +14,11 @@ export type CampaignFormat =
 export type AspectRatio = '4:5' | '9:16' | '16:9' | '3:4' | '1:1' | '21:9';
 
 export type MediaModelKind =
-  | 'key_visual'       // fal-ai/flux-pro/v1.1 | google/imagen-3
-  | 'typography_art'   // fal-ai/ideogram/v2
-  | 'upscale_print'    // fal-ai/clarity-upscaler
-  | 'video_teaser';    // fal-ai/kling-video
+  | 'key_visual'           // fal-ai/flux-pro/v1.1
+  | 'typography_art'       // fal-ai/ideogram/v2
+  | 'product_composition'  // fal-ai/imagen3 (composição fiel com produto real)
+  | 'upscale_print'        // fal-ai/clarity-upscaler
+  | 'video_teaser';        // fal-ai/kling-video
 
 export interface FormatSpec {
   format: CampaignFormat;
@@ -142,6 +143,10 @@ export interface PieceArtPrompt {
   cta?: string;
   /** Define roteamento: true -> Ideogram v2; false -> Flux Pro v1.1 */
   hasTextInArt: boolean;
+  /** Define roteamento: true -> Google Imagen 3 (composição fiel de produto real) */
+  preserveProductIdentity?: boolean;
+  /** URL da foto real do produto enviada pelo cliente (quando aplicável) */
+  referenceImageUrl?: string;
   /** Define se precisa passar pelo Clarity Upscaler (4x/8x) para impressão */
   requiresUpscale: boolean;
   /** Define se deve gerar teaser/loop em vídeo (Kling) */

@@ -3,6 +3,7 @@ import type {
   KeyVisualRequest,
   MediaGenerationResult,
   MediaProvider,
+  ProductCompositionRequest,
   TypographyArtRequest,
   UpscaleRequest,
   VideoAnimationRequest,
@@ -11,6 +12,7 @@ import type {
 export const FAL_MODELS = {
   KEY_VISUAL: 'fal-ai/flux-pro/v1.1',
   TYPOGRAPHY_ART: 'fal-ai/ideogram/v2',
+  PRODUCT_COMPOSITION: 'fal-ai/imagen3',
   UPSCALE_PRINT: 'fal-ai/clarity-upscaler',
   VIDEO_TEASER: 'fal-ai/kling-video/v1.6/standard/image-to-video',
 } as const;
@@ -144,6 +146,36 @@ export class FalMediaProvider implements MediaProvider {
       provider: this.name,
       modelId: FAL_MODELS.TYPOGRAPHY_ART,
       modelKind: 'typography_art',
+      url: image.url,
+      width: image.width,
+      height: image.height,
+      seed: data.seed,
+      requestId: data.request_id,
+    };
+  }
+
+  async composeProductVisual(req: ProductCompositionRequest): Promise<MediaGenerationResult> {
+    const data = await this.invoke<{
+      images?: Array<{ url: string; width?: number; height?: number }>;
+      seed?: number;
+      request_id?: string;
+    }>(FAL_MODELS.PRODUCT_COMPOSITION, {
+      prompt: req.prompt,
+      aspect_ratio: req.aspectRatio === '4:5' ? '3:4' : req.aspectRatio === '21:9' ? '16:9' : req.aspectRatio,
+      ...(req.referenceImageUrl ? { image_url: req.referenceImageUrl } : {}),
+      ...(req.negativePrompt ? { negative_prompt: req.negativePrompt } : {}),
+      ...(req.seed !== undefined ? { seed: req.seed } : {}),
+    });
+
+    const image = data.images?.[0];
+    if (!image?.url) {
+      throw new Error(`fal.ai (${FAL_MODELS.PRODUCT_COMPOSITION}) não retornou URL de imagem.`);
+    }
+
+    return {
+      provider: this.name,
+      modelId: FAL_MODELS.PRODUCT_COMPOSITION,
+      modelKind: 'product_composition',
       url: image.url,
       width: image.width,
       height: image.height,

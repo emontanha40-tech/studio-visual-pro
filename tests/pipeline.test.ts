@@ -102,7 +102,7 @@ test('artDirectorAgent valida saída estruturada com Zod e rejeita JSON inválid
   );
 });
 
-test('FalMediaProvider exige FAL_KEY e aciona os 4 endpoints corretos da fal.ai', async () => {
+test('FalMediaProvider exige FAL_KEY e aciona os 5 endpoints corretos da fal.ai', async () => {
   assert.throws(() => new FalMediaProvider({ apiKey: '' }), /FAL_KEY/);
 
   const calls: Array<{ url: string; auth: string | null }> = [];
@@ -124,14 +124,20 @@ test('FalMediaProvider exige FAL_KEY e aciona os 4 endpoints corretos da fal.ai'
 
   const kv = await provider.generateKeyVisual({ prompt: 'clean studio photo', aspectRatio: '16:9' });
   const typo = await provider.generateTypographyArt({ prompt: 'poster with text', aspectRatio: '4:5' });
+  const prod = await provider.composeProductVisual({
+    prompt: 'exact product bottle on marble table',
+    aspectRatio: '4:5',
+    referenceImageUrl: 'https://cdn.cliente.com/produto.png',
+  });
   const up = await provider.upscaleForPrint({ imageUrl: kv.url });
   const vid = await provider.animateTeaser({ imageUrl: kv.url, motionPrompt: 'slow pan' });
 
   assert.equal(kv.modelId, FAL_MODELS.KEY_VISUAL);
   assert.equal(typo.modelId, FAL_MODELS.TYPOGRAPHY_ART);
+  assert.equal(prod.modelId, FAL_MODELS.PRODUCT_COMPOSITION);
   assert.equal(up.url, 'https://cdn.fal.ai/upscaled.png');
   assert.equal(vid.url, 'https://cdn.fal.ai/teaser.mp4');
-  assert.equal(calls.length, 4);
+  assert.equal(calls.length, 5);
   assert.ok(calls.every((c) => c.auth === 'Key test-key-123'));
 });
 

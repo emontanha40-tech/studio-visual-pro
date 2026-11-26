@@ -11,17 +11,24 @@ async function produceSinglePiece(
   piece: PieceArtPrompt,
   provider: MediaProvider,
 ): Promise<GeneratedMediaAsset> {
-  const baseResult = piece.hasTextInArt
-    ? await provider.generateTypographyArt({
+  const baseResult = piece.preserveProductIdentity || piece.referenceImageUrl
+    ? await provider.composeProductVisual({
         prompt: piece.visualPrompt,
         aspectRatio: piece.aspectRatio,
+        referenceImageUrl: piece.referenceImageUrl,
         negativePrompt: piece.negativePrompt,
       })
-    : await provider.generateKeyVisual({
-        prompt: piece.visualPrompt,
-        aspectRatio: piece.aspectRatio,
-        negativePrompt: piece.negativePrompt,
-      });
+    : piece.hasTextInArt
+      ? await provider.generateTypographyArt({
+          prompt: piece.visualPrompt,
+          aspectRatio: piece.aspectRatio,
+          negativePrompt: piece.negativePrompt,
+        })
+      : await provider.generateKeyVisual({
+          prompt: piece.visualPrompt,
+          aspectRatio: piece.aspectRatio,
+          negativePrompt: piece.negativePrompt,
+        });
 
   let upscaledUrl: string | undefined;
   if (piece.requiresUpscale) {

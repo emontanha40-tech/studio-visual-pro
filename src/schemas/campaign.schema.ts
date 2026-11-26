@@ -53,6 +53,8 @@ export const PieceArtPromptSchema = z.object({
   subheadline: z.string().max(240).optional(),
   cta: z.string().max(80).optional(),
   hasTextInArt: z.boolean(),
+  preserveProductIdentity: z.boolean().optional(),
+  referenceImageUrl: z.string().url().optional(),
   requiresUpscale: z.boolean(),
   generateTeaserVideo: z.boolean(),
   visualPrompt: z.string().min(20, 'Prompt técnico muito curto'),
