@@ -1,9 +1,20 @@
 import http from 'node:http';
+import { existsSync } from 'node:fs';
 import { carregarAcervo } from './src/acervo-catalogo.mjs';
 import { pathToFileURL } from 'node:url';
 import { readFile } from 'node:fs/promises';
 import { CampaignQueue } from './src/queues/campaignQueue.ts';
 import { createMediaProvider } from './src/services/ai-media/index.ts';
+
+// Carrega .env automaticamente (Node 22+) para que FAL_KEY / ANTHROPIC_API_KEY nunca fiquem vazias
+const envPath = new URL('.env', import.meta.url);
+if (existsSync(envPath) && typeof process.loadEnvFile === 'function') {
+  try {
+    process.loadEnvFile(envPath);
+  } catch {
+    // ignora erro de leitura de .env opcional
+  }
+}
 
 const port = Number(process.env.PORT || 4173);
 const bindHost = process.env.BIND_HOST || '127.0.0.1';
