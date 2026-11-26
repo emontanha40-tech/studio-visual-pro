@@ -141,6 +141,58 @@ export function createGeminiJsonClient(options: {
 }
 
 /**
+ * Cliente LLM Anthropic Claude (`ANTHROPIC_API_KEY`) com saída JSON estruturada.
+ */
+export function createAnthropicJsonClient(options: {
+  apiKey?: string;
+  model?: string;
+  fetchImpl?: typeof fetch;
+} = {}): StructuredLLMClient {
+  const apiKey = options.apiKey ?? process.env.ANTHROPIC_API_KEY ?? '';
+  const model = options.model ?? 'claude-3-5-sonnet-latest';
+  const fetchImpl = options.fetchImpl ?? fetch;
+
+  return {
+    async generateJson({ systemPrompt, userPrompt }) {
+      if (!apiKey.trim()) {
+        throw new Error('ANTHROPIC_API_KEY não configurada.');
+      }
+
+      const response = await fetchImpl('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model,
+          max_tokens: 4096,
+          system: systemPrompt,
+          messages: [{ role: 'user', content: userPrompt }],
+        }),
+      });
+
+      if (!response.ok) {
+        const text = await response.text().catch(() => '');
+        throw new Error(`Anthropic API falhou (HTTP ${response.status}): ${text.slice(0, 300)}`);
+      }
+
+      const data = (await response.json()) as {
+        content?: Array<{ type?: string; text?: string }>;
+      };
+      const rawText = data.content?.find((c) => c.type === 'text')?.text?.trim();
+      if (!rawText) {
+        throw new Error('Anthropic API retornou resposta vazia.');
+      }
+
+      const cleaned = rawText.replace(/^```json\s*/i, '').replace(/```$/i, '').trim();
+      return JSON.parse(cleaned);
+    },
+  };
+}
+
+/**
  * Agente 1 — Diretor de Arte (`artDirectorAgent`).
  * Valida entrada e saída rigorosamente com Zod.
  */
@@ -152,7 +204,11 @@ export async function artDirectorAgent(
   const formats = resolveTargetFormats(brief);
   const { systemPrompt, userPrompt } = buildArtDirectorPrompts(brief, formats);
 
-  const client = options.llmClient ?? createGeminiJsonClient({ model: options.model });
+  const client =
+    options.llmClient ??
+    (process.env.GEMINI_API_KEY?.trim()
+      ? createGeminiJsonClient({ model: options.model })
+      : createAnthropicJsonClient({ model: options.model }));
   const rawOutput = await client.generateJson({ systemPrompt, userPrompt });
 
   const validated = ArtDirectorOutputSchema.parse(rawOutput);
