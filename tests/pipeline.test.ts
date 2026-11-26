@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import http from 'node:http';
 import {
   artDirectorAgent,
   buildArtDirectorPrompts,
@@ -214,4 +215,96 @@ test('qaReviewerAgent bloqueia aprovação quando encontra BLOCKER (ex: texto bo
   assert.equal(review.passed, false);
   assert.equal(review.requiresHumanReview, true);
   assert.equal(review.issues[0]?.severity, 'BLOCKER');
+});
+
+test('server.mjs conecta POST /api/campaigns, GET /api/campaigns/:id e /showcase', async (t) => {
+  const { createServer } = await import('../server.mjs');
+  const mockFetch = (async (input: string | URL | Request) => {
+    const url = String(input);
+    if (url.endsWith(FAL_MODELS.UPSCALE_PRINT)) {
+      return new Response(JSON.stringify({ image: { url: 'https://cdn.fal.ai/backdrop-4x.png' } }), { status: 200 });
+    }
+    if (url.endsWith(FAL_MODELS.VIDEO_TEASER)) {
+      return new Response(JSON.stringify({ video: { url: 'https://cdn.fal.ai/banner-teaser.mp4' } }), { status: 200 });
+    }
+    return new Response(JSON.stringify({ images: [{ url: 'https://cdn.fal.ai/art.png' }] }), { status: 200 });
+  }) as typeof fetch;
+
+  const queue = new CampaignQueue({
+    mediaProvider: new FalMediaProvider({ apiKey: 'test-key-123', fetchImpl: mockFetch }),
+    artDirectorOptions: { llmClient: { generateJson: async () => VALID_ART_DIRECTION } },
+  });
+
+  const server = createServer({ campaignQueue: queue });
+  await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
+  t.after(() => new Promise<void>((resolve) => server.close(() => resolve())));
+  const address = server.address();
+  assert.ok(address && typeof address === 'object');
+
+  const postRes = await new Promise<{ status: number; body: string }>((resolve, reject) => {
+    const req = http.request(
+      {
+        host: '127.0.0.1',
+        port: address.port,
+        path: '/api/campaigns',
+        method: 'POST',
+        headers: { Host: '127.0.0.1:4173', 'Content-Type': 'application/json' },
+      },
+      (res) => {
+        let body = '';
+        res.on('data', (d) => (body += d));
+        res.on('end', () => resolve({ status: res.statusCode ?? 0, body }));
+      },
+    );
+    req.on('error', reject);
+    req.end(JSON.stringify(SAMPLE_BRIEF));
+  });
+
+  assert.equal(postRes.status, 201);
+  const created = JSON.parse(postRes.body);
+  assert.equal(created.status, 'SHOWCASE_READY');
+
+  const getRes = await new Promise<{ status: number; body: string }>((resolve, reject) => {
+    const req = http.request(
+      {
+        host: '127.0.0.1',
+        port: address.port,
+        path: `/api/campaigns/${created.id}`,
+        method: 'GET',
+        headers: { Host: '127.0.0.1:4173' },
+      },
+      (res) => {
+        let body = '';
+        res.on('data', (d) => (body += d));
+        res.on('end', () => resolve({ status: res.statusCode ?? 0, body }));
+      },
+    );
+    req.on('error', reject);
+    req.end();
+  });
+
+  assert.equal(getRes.status, 200);
+  assert.equal(JSON.parse(getRes.body).id, created.id);
+
+  const showcaseRes = await new Promise<{ status: number; body: string }>((resolve, reject) => {
+    const req = http.request(
+      {
+        host: '127.0.0.1',
+        port: address.port,
+        path: '/showcase',
+        method: 'GET',
+        headers: { Host: '127.0.0.1:4173' },
+      },
+      (res) => {
+        let body = '';
+        res.on('data', (d) => (body += d));
+        res.on('end', () => resolve({ status: res.statusCode ?? 0, body }));
+      },
+    );
+    req.on('error', reject);
+    req.end();
+  });
+
+  assert.equal(showcaseRes.status, 200);
+  assert.match(showcaseRes.body, /Preview Interativo de Campanha/);
 });
