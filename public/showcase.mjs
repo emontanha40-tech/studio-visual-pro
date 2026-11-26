@@ -83,3 +83,34 @@ if (typeof window !== 'undefined' && typeof document !== 'undefined') {
       .catch((err) => setText('hero-subheadline', err.message));
   }
 }
+
+if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+  const form = document.getElementById('campaign-form');
+  form?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const button = document.getElementById('campaign-submit');
+    const brief = Object.fromEntries(
+      [...new FormData(form)].filter(([, v]) => String(v).trim() !== ''),
+    );
+    button.disabled = true;
+    setText('campaign-status', 'Produzindo campanha… pode levar alguns minutos.');
+    try {
+      const res = await fetch('/api/campaigns', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(brief),
+      });
+      const body = await res.json();
+      if (!res.ok && !body.showcase) {
+        throw new Error(body.erro || body.error || `Falha (${res.status})`);
+      }
+      history.replaceState(null, '', `?jobId=${encodeURIComponent(body.id)}`);
+      setText('campaign-status', `Status: ${body.status}`);
+      renderShowcase(body);
+    } catch (err) {
+      setText('campaign-status', err.message);
+    } finally {
+      button.disabled = false;
+    }
+  });
+}

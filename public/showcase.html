@@ -16,6 +16,20 @@
       <span id="qa-badge" style="padding:6px 12px;border-radius:999px;font-size:13px;background:#1e293b;color:#f8fafc;">Aguardando campanha</span>
     </header>
 
+    <section style="margin-bottom:28px;">
+      <h3 style="margin:0 0 12px;">Nova campanha</h3>
+      <form id="campaign-form" style="display:grid;gap:10px;max-width:640px;">
+        <input name="client" placeholder="Cliente" required maxlength="2000" />
+        <input name="title" placeholder="Tema / título" required maxlength="2000" />
+        <input name="goal" placeholder="Objetivo" required maxlength="2000" />
+        <input name="audience" placeholder="Público-alvo" required maxlength="2000" />
+        <input name="style" placeholder="Preferência visual" required maxlength="2000" />
+        <input name="colors" placeholder="Cores (opcional)" maxlength="2000" />
+        <button id="campaign-submit" type="submit">Gerar campanha</button>
+        <p id="campaign-status" role="status" style="margin:0;font-size:13px;opacity:0.85;"></p>
+      </form>
+    </section>
+
     <section id="hero-section" style="border-radius:16px;padding:36px;margin-bottom:28px;background:#152c36;color:#f6f2e8;">
       <h2 id="hero-headline" style="margin:0 0 12px;font-size:32px;">Carregue uma campanha via /api/campaigns</h2>
       <p id="hero-subheadline" style="margin:0;max-width:680px;line-height:1.5;opacity:0.9;">
