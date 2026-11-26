@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { artDirectorAgent, type ArtDirectorOptions } from '../agents/artDirectorAgent.ts';
 import { mediaProducerAgent } from '../agents/mediaProducerAgent.ts';
+import { qaReviewerAgent, type QaReviewerOptions } from '../agents/qaReviewerAgent.ts';
 import { showcaseBuilderAgent } from '../agents/showcaseBuilderAgent.ts';
 import type { MediaProvider } from '../services/ai-media/types.ts';
 import type { CampaignBriefInput, PipelineJob } from '../types/campaign.ts';
@@ -8,6 +9,7 @@ import type { CampaignBriefInput, PipelineJob } from '../types/campaign.ts';
 export interface CampaignQueueDeps {
   mediaProvider: MediaProvider;
   artDirectorOptions?: ArtDirectorOptions;
+  qaReviewerOptions?: QaReviewerOptions;
 }
 
 /**
@@ -51,6 +53,10 @@ export class CampaignQueue {
       job.status = 'MEDIA_PRODUCTION';
       job.updatedAt = new Date().toISOString();
       job.production = await mediaProducerAgent(job.artDirection, this.deps.mediaProvider);
+
+      job.status = 'QA_REVIEW';
+      job.updatedAt = new Date().toISOString();
+      job.qaReview = await qaReviewerAgent(job.production, this.deps.qaReviewerOptions);
 
       job.showcase = showcaseBuilderAgent(job.production);
       job.status = 'SHOWCASE_READY';

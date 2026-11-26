@@ -78,5 +78,23 @@ export const ArtDirectorOutputSchema = z.object({
   readyForPrint: z.literal(false).default(false),
 });
 
+export const QaIssueSchema = z.object({
+  severity: z.enum(['BLOCKER', 'WARNING', 'SUGGESTION']),
+  product: CampaignFormatSchema,
+  field: z.string().min(1),
+  expected: z.string().min(1),
+  observed: z.string().min(1),
+  remediation: z.string().min(1),
+});
+
+export const QaReviewResultSchema = z.object({
+  passed: z.boolean(),
+  issues: z.array(QaIssueSchema),
+  checksNotPerformed: z.array(z.string()),
+  requiresHumanReview: z.literal(true).default(true),
+  reviewedAt: z.string().min(1),
+});
+
 export type ValidatedArtDirectorOutput = z.infer<typeof ArtDirectorOutputSchema>;
 export type ValidatedCampaignBrief = z.infer<typeof CampaignBriefSchema>;
+export type ValidatedQaReviewResult = z.infer<typeof QaReviewResultSchema>;

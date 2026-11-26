@@ -196,6 +196,25 @@ export interface MediaProductionResult {
   errors: Array<{ format: CampaignFormat; stage: MediaModelKind; message: string }>;
 }
 
+export type QaIssueSeverity = 'BLOCKER' | 'WARNING' | 'SUGGESTION';
+
+export interface QaIssue {
+  severity: QaIssueSeverity;
+  product: CampaignFormat;
+  field: string;
+  expected: string;
+  observed: string;
+  remediation: string;
+}
+
+export interface QaReviewResult {
+  passed: boolean;
+  issues: QaIssue[];
+  checksNotPerformed: string[];
+  requiresHumanReview: true;
+  reviewedAt: string;
+}
+
 export interface ShowcaseSlide {
   id: string;
   title: string;
@@ -230,6 +249,7 @@ export type PipelineJobStatus =
   | 'QUEUED'
   | 'ART_DIRECTION'
   | 'MEDIA_PRODUCTION'
+  | 'QA_REVIEW'
   | 'SHOWCASE_READY'
   | 'FAILED_RETRYABLE';
 
@@ -239,6 +259,7 @@ export interface PipelineJob {
   brief: CampaignBriefInput;
   artDirection?: ArtDirectorOutput;
   production?: MediaProductionResult;
+  qaReview?: QaReviewResult;
   showcase?: ShowcaseOutput;
   error?: string;
   createdAt: string;

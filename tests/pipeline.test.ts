@@ -9,6 +9,7 @@ import {
   FAL_MODELS,
   FalMediaProvider,
 } from '../src/services/ai-media/fal-provider.ts';
+import { qaReviewerAgent } from '../src/agents/qaReviewerAgent.ts';
 import { CampaignQueue } from '../src/queues/campaignQueue.ts';
 import type { ArtDirectorOutput, CampaignBriefInput } from '../src/types/campaign.ts';
 
@@ -166,7 +167,51 @@ test('CampaignQueue executa pipeline completo (Diretor -> Produtor -> Showcase)'
   assert.equal(done.status, 'SHOWCASE_READY');
   assert.equal(done.production?.assets.length, 3);
   assert.equal(done.production?.errors.length, 0);
+  assert.equal(done.qaReview?.requiresHumanReview, true);
   assert.equal(done.showcase?.presentation.slides.length, 3);
   assert.equal(done.showcase?.webPreviewSpec.heroBackgroundType, 'video');
   assert.equal(done.showcase?.webPreviewSpec.heroBackgroundUrl, 'https://cdn.fal.ai/banner-teaser.mp4');
+});
+
+test('qaReviewerAgent bloqueia aprovação quando encontra BLOCKER (ex: texto borrado ou anatomia)', async () => {
+  const review = await qaReviewerAgent(
+    {
+      artDirection: VALID_ART_DIRECTION,
+      assets: [
+        {
+          id: 'asset-1',
+          format: 'instagram_feed',
+          modelKind: 'typography_art',
+          modelId: FAL_MODELS.TYPOGRAPHY_ART,
+          url: 'https://cdn.fal.ai/feed.png',
+          createdAt: new Date().toISOString(),
+        },
+      ],
+      errors: [],
+    },
+    {
+      visionClient: {
+        inspectAssets: async () => ({
+          passed: true,
+          issues: [
+            {
+              severity: 'BLOCKER',
+              product: 'instagram_feed',
+              field: 'headline',
+              expected: 'Luz nas Nações',
+              observed: 'Texto borrado na segunda palavra',
+              remediation: 'Regerar peça no Ideogram v2 com contraste maior',
+            },
+          ],
+          checksNotPerformed: ['Validação CMYK de gráfica'],
+          requiresHumanReview: true,
+          reviewedAt: new Date().toISOString(),
+        }),
+      },
+    },
+  );
+
+  assert.equal(review.passed, false);
+  assert.equal(review.requiresHumanReview, true);
+  assert.equal(review.issues[0]?.severity, 'BLOCKER');
 });
