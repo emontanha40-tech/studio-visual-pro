@@ -12,6 +12,10 @@ import { createTeaserQueue } from './src/kit/teaser.mjs';
 import { fillQuickBrief } from './src/brand/quickBrief.mjs';
 import { generateKit } from './src/brand/kitService.mjs';
 import { openProjectStore, isKitId } from './src/brand/projectStore.mjs';
+import { openStyleStore, isPresetId } from './src/style-lab/store.mjs';
+import { extractStyleFromUrl } from './src/style-lab/urlExtractor.mjs';
+import { extractStyleFromImage } from './src/style-lab/imageExtractor.mjs';
+import { extractStyleFromVideo } from './src/style-lab/videoExtractor.mjs';
 import { generateCampaignPiece, publishedFile, PUBLISHED_DIR } from './src/brand/campaignService.mjs';
 import { pathToFileURL } from 'node:url';
 import { readFile } from 'node:fs/promises';
@@ -49,11 +53,13 @@ const routes = new Map([
   ['/', ['public/index.html', 'text/html']],
   ['/website', ['public/website.html', 'text/html']],
   ['/showcase', ['public/showcase.html', 'text/html']],
+  ['/estilo', ['public/estilo.html', 'text/html']],
   ['/app.mjs', ['public/app.mjs', 'text/javascript']],
   ['/website.mjs', ['public/website.mjs', 'text/javascript']],
   ['/kit', ['public/kit.html', 'text/html']],
   ['/shell.mjs', ['public/shell.mjs', 'text/javascript']],
   ['/kit.mjs', ['public/kit.mjs', 'text/javascript']],
+  ['/estilo.mjs', ['public/estilo.mjs', 'text/javascript']],
   ['/showcase.mjs', ['public/showcase.mjs', 'text/javascript']],
   ['/style.css', ['public/style.css', 'text/css']],
   ['/engine.mjs', ['src/engine.mjs', 'text/javascript']],
@@ -70,14 +76,14 @@ function sendJson(res, status, payload) {
   res.end(JSON.stringify(payload));
 }
 
-function readJsonBody(req) {
+function readJsonBody(req, maxBytes = MAX_BODY_BYTES) {
   return new Promise((resolve, reject) => {
     let raw = '';
     let size = 0;
     req.on('data', (chunk) => {
       size += chunk.length;
-      if (size > MAX_BODY_BYTES) {
-        reject(new Error('Corpo da requisição excede o limite de 64 KB.'));
+      if (size > maxBytes) {
+        reject(new Error(`Corpo da requisição excede o limite de ${Math.round(maxBytes / 1024)} KB.`));
         req.destroy();
         return;
       }
@@ -94,18 +100,71 @@ function readJsonBody(req) {
   });
 }
 
+function readRawBody(req, maxBytes) {
+  return new Promise((resolve, reject) => {
+    const chunks = [];
+    let size = 0;
+    req.on('data', (chunk) => {
+      size += chunk.length;
+      if (size > maxBytes) {
+        reject(new Error(`Arquivo excede o limite de ${Math.round(maxBytes / (1024 * 1024))} MB.`));
+        req.destroy();
+        return;
+      }
+      chunks.push(chunk);
+    });
+    req.on('end', () => resolve(Buffer.concat(chunks)));
+    req.on('error', reject);
+  });
+}
+
 function getDefaultQueue() {
   return new CampaignQueue({ mediaProvider: createMediaProvider() });
 }
 
 /**
- * @param {{ lerAcervo?: typeof carregarAcervo, campaignQueue?: CampaignQueue | null, extraAllowedHosts?: string[], projectStore?: ReturnType<typeof openProjectStore> | null, kitDeps?: Record<string, any> }} [options]
+ * @param {{ lerAcervo?: typeof carregarAcervo, campaignQueue?: CampaignQueue | null, extraAllowedHosts?: string[], projectStore?: ReturnType<typeof openProjectStore> | null, styleStore?: ReturnType<typeof openStyleStore> | null, kitDeps?: Record<string, any> }} [options]
  */
-export function createServer({ lerAcervo = carregarAcervo, campaignQueue = null, extraAllowedHosts = rawExtraHosts, projectStore = null, kitDeps = {} } = {}) {
+export function createServer({ lerAcervo = carregarAcervo, campaignQueue = null, extraAllowedHosts = rawExtraHosts, projectStore = null, styleStore = null, kitDeps = {} } = {}) {
   const teaserQueue = createTeaserQueue(kitDeps.renderTeaser);
   let activeQueue = campaignQueue ?? null;
   let activeStore = projectStore ?? null;
+  let activeStyleStore = styleStore ?? null;
   const getStore = () => activeStore ?? (activeStore = openProjectStore());
+  const getStyleStore = () => activeStyleStore ?? (activeStyleStore = openStyleStore());
+  const enrichPreset = (payload) => {
+    if (!payload || typeof payload !== 'object') return payload;
+    delete payload.custom_brand_kit;
+    if (payload.identidade && typeof payload.identidade === 'object') delete payload.identidade.custom_brand_kit;
+    const modelo = payload.modelo || payload.identidade?.modelo;
+    if (typeof modelo === 'string' && modelo.startsWith('custom-')) {
+      const preset = getStyleStore().getPreset(modelo);
+      if (preset?.brand_kit) {
+        if (payload.identidade && typeof payload.identidade === 'object') {
+          return { ...payload, identidade: { ...payload.identidade, custom_brand_kit: preset.brand_kit } };
+        }
+        return { ...payload, custom_brand_kit: preset.brand_kit };
+      }
+      throw new Error('O preset selecionado não está mais disponível.');
+    }
+    return payload;
+  };
+  let extractingStyle = false;
+  async function runStyleExtraction(res, work) {
+    if (extractingStyle) {
+      sendJson(res, 429, { ok: false, erro: 'Uma extração de estilo já está em andamento.' });
+      return;
+    }
+    extractingStyle = true;
+    try {
+      const result = await work();
+      sendJson(res, 200, { ok: true, ...result });
+    } catch (err) {
+      sendJson(res, 400, { ok: false, erro: err instanceof Error ? err.message : 'Falha ao extrair o estilo.' });
+    } finally {
+      extractingStyle = false;
+    }
+  }
   const publishDir = kitDeps.publishDir ?? PUBLISHED_DIR;
   const normalizedExtraHosts = normalizeAllowedHosts(extraAllowedHosts, port);
 
@@ -166,7 +225,7 @@ export function createServer({ lerAcervo = carregarAcervo, campaignQueue = null,
 
     if (req.method === 'POST' && pathname === '/api/kit/teasers') {
       try {
-        const { status, body } = teaserQueue.submit(await readJsonBody(req));
+        const { status, body } = teaserQueue.submit(enrichPreset(await readJsonBody(req)));
         sendJson(res, status, body);
       } catch {
         sendJson(res, 400, { code: 'invalid_briefing', erro: 'Não foi possível ler o briefing.' });
@@ -219,7 +278,12 @@ export function createServer({ lerAcervo = carregarAcervo, campaignQueue = null,
       try {
         const { briefing } = await readJsonBody(req);
         const r = await fillQuickBrief(String(briefing ?? ''));
-        const modelo = { saas_modern: 'tech-cinematografico', local_authority: 'editorial-clean', product_launch: 'comercial-conversao' }[r.archetype] || 'tech-cinematografico';
+        const bText = String(briefing ?? '').toLowerCase();
+        const modelo = /igreja|culto|minist[eé]r|s[eé]rie b[ií]blica|confer[eê]ncia crist[aã]|pastor/.test(bText)
+          ? 'ministerial-serie'
+          : /su[ií][çc]o|minimalista|arquitetura|galeria|est[uú]dio de design/.test(bText)
+            ? 'minimalista-suico'
+            : ({ saas_modern: 'tech-cinematografico', local_authority: 'editorial-clean', product_launch: 'comercial-conversao' }[r.archetype] || 'tech-cinematografico');
         const cut = (t, n) => String(t).slice(0, n);
         sendJson(res, 200, { ok: true, origem: r.source, campos: {
           marca: cut(r.tokens?.brand_name ?? r.brand_name ?? '', 60), nicho: cut(String(briefing).trim(), 80),
@@ -233,7 +297,7 @@ export function createServer({ lerAcervo = carregarAcervo, campaignQueue = null,
 
     if (req.method === 'POST' && pathname === '/api/kit/identity') {
       try {
-        sendJson(res, 200, { ok: true, identidade: buildIdentity(await readJsonBody(req)) });
+        sendJson(res, 200, { ok: true, identidade: buildIdentity(enrichPreset(await readJsonBody(req))) });
       } catch (err) {
         sendJson(res, 400, { ok: false, erro: err instanceof Error ? err.message : 'Identidade inválida.' });
       }
@@ -242,7 +306,7 @@ export function createServer({ lerAcervo = carregarAcervo, campaignQueue = null,
 
     if (req.method === 'POST' && pathname === '/api/kit/build') {
       try {
-        const { zip, manifest } = await buildKit(await readJsonBody(req), { ...(kitDeps.rasterizer && { rasterizer: kitDeps.rasterizer }), ...(kitDeps.renderTeaser && { teaserRenderer: kitDeps.renderTeaser }), ...(kitDeps.photoResolver && { photoResolver: kitDeps.photoResolver }) });
+        const { zip, manifest } = await buildKit(enrichPreset(await readJsonBody(req)), { ...(kitDeps.rasterizer && { rasterizer: kitDeps.rasterizer }), ...(kitDeps.renderTeaser && { teaserRenderer: kitDeps.renderTeaser }), ...(kitDeps.photoResolver && { photoResolver: kitDeps.photoResolver }) });
         res.writeHead(200, {
           'Content-Type': 'application/zip',
           'Content-Disposition': 'attachment; filename="kit-studio-visual-pro.zip"',
@@ -257,9 +321,90 @@ export function createServer({ lerAcervo = carregarAcervo, campaignQueue = null,
       return;
     }
 
+    // ===== Fatia 12: Laboratório de Estilo (Engenharia Reversa de DNA Visual & Motion) =====
+    if (pathname.startsWith('/api/style-lab/') && req.method !== 'GET' &&
+        (req.headers['sec-fetch-site'] === 'cross-site' ||
+          (req.headers.origin && req.headers.origin !== `http://${req.headers.host}` &&
+            req.headers.origin !== `https://${req.headers.host}`))) {
+      sendJson(res, 403, { ok: false, erro: 'Origem não autorizada.' });
+      return;
+    }
+
+    if (req.method === 'GET' && pathname === '/api/style-lab/presets') {
+      const nativos = Object.values(BRAND_KITS).map((k) => ({ id: k.id, name: k.nome, source_type: 'native', brand_kit: k }));
+      const customizados = getStyleStore().listPresets(100);
+      sendJson(res, 200, { ok: true, nativos, customizados });
+      return;
+    }
+
+    if (req.method === 'POST' && pathname === '/api/style-lab/presets') {
+      try {
+        const body = await readJsonBody(req, 512 * 1024);
+        const saved = getStyleStore().savePreset(body);
+        sendJson(res, 201, { ok: true, preset: saved });
+      } catch (err) {
+        sendJson(res, 400, { ok: false, erro: err instanceof Error ? err.message : 'Falha ao salvar preset.' });
+      }
+      return;
+    }
+
+    const delPresetMatch = /^\/api\/style-lab\/presets\/([a-z0-9-]+)$/.exec(pathname);
+    if (req.method === 'DELETE' && delPresetMatch) {
+      const id = delPresetMatch[1];
+      if (!isPresetId(id) || !getStyleStore().deletePreset(id)) {
+        sendJson(res, 404, { ok: false, erro: 'Preset não encontrado.' });
+        return;
+      }
+      sendJson(res, 200, { ok: true, id });
+      return;
+    }
+
+    if (req.method === 'POST' && pathname === '/api/style-lab/extract/url') {
+      await runStyleExtraction(res, async () => {
+        const body = await readJsonBody(req);
+        const extractor = kitDeps.extractStyleFromUrl || extractStyleFromUrl;
+        return extractor(body.url, { allowPrivate: Boolean(kitDeps.allowPrivateUrls) });
+      });
+      return;
+    }
+
+    if (req.method === 'POST' && pathname === '/api/style-lab/extract/image') {
+      await runStyleExtraction(res, async () => {
+        const body = await readJsonBody(req, 12 * 1024 * 1024);
+        const rawB64 = String(body.imageBase64 || '').replace(/^data:[^;]+;base64,/, '');
+        if (!rawB64) throw new Error('Envie uma imagem em base64 para extração.');
+        const buf = Buffer.from(rawB64, 'base64');
+        const extractor = kitDeps.extractStyleFromImage || extractStyleFromImage;
+        return extractor(buf, {
+          mimeType: body.mimeType || 'image/png',
+          filename: body.filename || 'referencia.png',
+        });
+      });
+      return;
+    }
+
+    if (req.method === 'POST' && pathname === '/api/style-lab/extract/video') {
+      await runStyleExtraction(res, async () => {
+        const ct = String(req.headers['content-type'] || '').toLowerCase();
+        let buf;
+        let filename = urlObj.searchParams.get('filename') || 'referencia.mp4';
+        if (ct.includes('application/json')) {
+          const body = await readJsonBody(req, 36 * 1024 * 1024);
+          const rawB64 = String(body.videoBase64 || '').replace(/^data:[^;]+;base64,/, '');
+          buf = Buffer.from(rawB64, 'base64');
+          if (body.filename) filename = body.filename;
+        } else {
+          buf = await readRawBody(req, 26 * 1024 * 1024);
+        }
+        const extractor = kitDeps.extractStyleFromVideo || extractStyleFromVideo;
+        return extractor(buf, { filename });
+      });
+      return;
+    }
+
     if (req.method === 'POST' && pathname === '/api/website/extract') {
       try {
-        const payload = await readJsonBody(req);
+        const payload = enrichPreset(await readJsonBody(req));
         const ast = extractSemanticBriefing(payload);
         sendJson(res, 200, { ok: true, ast, brand_kits: Object.keys(BRAND_KITS) });
       } catch (err) {

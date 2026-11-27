@@ -2,6 +2,37 @@ const $ = (id) => document.getElementById(id);
 let catalogo = null;
 let identidadeValidada = null;
 
+async function carregarModelosCustomizados() {
+  const select = $('k-modelo');
+  if (!select) return;
+  try {
+    const res = await fetch('/api/style-lab/presets');
+    const data = await lerJsonSeguro(res);
+    if (!res.ok || !data?.ok || !Array.isArray(data.customizados)) return;
+    select.querySelectorAll('optgroup[data-custom="1"]').forEach((g) => g.remove());
+    if (data.customizados.length) {
+      const group = document.createElement('optgroup');
+      group.label = 'Laboratório de Estilo (Extraídos)';
+      group.dataset.custom = '1';
+      for (const preset of data.customizados) {
+        const opt = document.createElement('option');
+        opt.value = preset.id;
+        const tag = { url: 'URL', image: 'Arte', video: 'Vídeo' }[preset.source_type] || 'DNA';
+        opt.textContent = `${preset.name} (${tag})`;
+        group.append(opt);
+      }
+      select.append(group);
+    }
+    const qsModelo = new URLSearchParams(location.search).get('modelo');
+    if (qsModelo && [...select.options].some((o) => o.value === qsModelo)) {
+      select.value = qsModelo;
+    }
+  } catch {
+    // mantém os modelos nativos se a API estiver indisponível
+  }
+}
+void carregarModelosCustomizados();
+
 function dados() {
   return {
     marca: $('k-marca').value, nicho: $('k-nicho').value, slogan: $('k-slogan').value,
@@ -58,7 +89,8 @@ function montarPecas() {
       const n = document.createElement('span'); n.className = 'pn'; n.textContent = p.name;
       const d = document.createElement('span'); d.className = 'pd';
       const size = p.height ? `${p.width}×${p.height} ${p.unit || 'px'}` : `${p.width} px de largura`;
-      d.textContent = size + (p.print?.provisional ? ' · prova 1:10, gabarito a confirmar' : '');
+      const extra = p.print?.provisional ? ' · prova 1:10, gabarito a confirmar' : p.transparent ? ' · fundo transparente' : '';
+      d.textContent = size + extra;
       txt.append(n, d); l.append(c, icone(cat.id), txt); grid.append(l);
     }
     root.append(grid);

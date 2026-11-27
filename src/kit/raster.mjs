@@ -23,11 +23,11 @@ export async function renderSvgPngs(items, { scale = RETINA } = {}) {
     page.setDefaultTimeout(15000);
     await page.route('**/*', (route) => route.abort());
     const out = new Map();
-    for (const { id, width, height, svg } of items) {
+    for (const { id, width, height, svg, transparent = false } of items) {
       await page.setViewportSize({ width, height });
       await page.setContent(`<!doctype html><meta charset="utf-8"><style>${css} html,body{margin:0;overflow:hidden;background:transparent}svg{display:block}</style>${svg}`);
       await page.evaluate(() => document.fonts.ready);
-      out.set(id, await page.screenshot({ type: 'png', clip: { x: 0, y: 0, width, height } }));
+      out.set(id, await page.screenshot({ type: 'png', omitBackground: Boolean(transparent), clip: { x: 0, y: 0, width, height } }));
     }
     return out;
   } finally {

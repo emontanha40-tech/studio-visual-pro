@@ -7,9 +7,10 @@ const ITENS = [
   ['05', 'Acervo', '/#acervo', 'acervo'],
   ['06', 'Criador de Sites', '/website', 'website'],
   ['07', 'Kit em Lote', '/kit', 'kit'],
+  ['08', 'Laboratório de Estilo', '/estilo', 'estilo'],
 ];
 const path = location.pathname.replace(/\/$/, '') || '/';
-const rota = { '/website': 'website', '/kit': 'kit', '/showcase': 'showcase' }[path] || 'home';
+const rota = { '/website': 'website', '/kit': 'kit', '/showcase': 'showcase', '/estilo': 'estilo' }[path] || 'home';
 
 function el(tag, attrs = {}, ...kids) {
   const n = document.createElement(tag);

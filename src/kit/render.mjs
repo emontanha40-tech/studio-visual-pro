@@ -1,4 +1,5 @@
 import { escapeXML } from '../engine.mjs';
+import { CONSTITUTION_CSS, CONSTITUTION_JS, constitutionShell } from '../engine/design-constitution.mjs';
 
 const px = (n) => Math.round(n * 100) / 100;
 
@@ -33,6 +34,41 @@ ${uri ? `<image href="${uri}" width="${W}" height="${H}" preserveAspectRatio="${
   const head = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="${escapeXML(piece.name + ' — ' + identity.marca)}">`;
 
   if (piece.id === 'slide-fundo') return `${head}${bg}</svg>\n`; // fundo limpo, sem texto
+
+  if (piece.id === 'lower-third') {
+    const barX = Math.round(W * s.l);
+    const barW = Math.round(W * 0.48);
+    const barH = 164;
+    const barY = Math.round(H * (1 - s.b) - barH);
+    const ev = [identity.evento.data, identity.evento.local].filter(Boolean).join('  •  ');
+    const titleText = wrap(identity.headlines.hero, 32, 1)[0];
+    const subText = wrap(ev || identity.headlines.subtitulo, 46, 1)[0];
+    return `${head}<defs><linearGradient id="ltbg" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="${c.bg}" stop-opacity=".95"/><stop offset="1" stop-color="${c.surface}" stop-opacity=".9"/></linearGradient></defs>
+<rect x="${barX}" y="${barY}" width="${barW}" height="${barH}" rx="18" fill="url(#ltbg)" stroke="${c.primary}" stroke-opacity=".45" stroke-width="2"/>
+<rect x="${barX}" y="${barY}" width="14" height="${barH}" rx="7" fill="${c.primary}"/>
+<rect x="${barX + 40}" y="${barY + 24}" width="180" height="28" rx="14" fill="${c.primary}"/>
+<text x="${barX + 130}" y="${barY + 43}" text-anchor="middle" font-family="${escapeXML(font)}" font-weight="800" font-size="16" letter-spacing="2" fill="${c.onPrimary}">${escapeXML(identity.marca.toUpperCase().slice(0, 14))}</text>
+<text x="${barX + 40}" y="${barY + 100}" font-family="${escapeXML(font)}" font-weight="${identity.kit.typography.weightDisplay}" font-size="40" fill="${c.text}">${escapeXML(titleText)}</text>
+<text x="${barX + 40}" y="${barY + 138}" font-family="${escapeXML(font)}" font-weight="600" font-size="24" fill="${c.muted}">${escapeXML(subText)}</text>
+</svg>\n`;
+  }
+
+  if (piece.id === 'welcome-countdown') {
+    const cx = Math.round(W / 2);
+    const ev = [identity.evento.data, identity.evento.local].filter(Boolean).join('  •  ');
+    const titleLines = wrap(identity.headlines.hero, 28, 2);
+    const titleSvg = titleLines.map((l, i) => `<text x="${cx}" y="${Math.round(y0 + 185 + i * 74)}" text-anchor="middle" font-family="${escapeXML(font)}" font-weight="${identity.kit.typography.weightDisplay}" font-size="64" fill="${c.text}">${escapeXML(l)}</text>`).join('');
+    const boxW = 460, boxH = 190, boxX = cx - boxW / 2, boxY = Math.round(y0 + 340);
+    return `${head}${bg}
+<rect x="${cx - 190}" y="${Math.round(y0 + 24)}" width="380" height="44" rx="22" fill="${c.surface}" stroke="${c.primary}" stroke-width="2"/>
+<text x="${cx}" y="${Math.round(y0 + 53)}" text-anchor="middle" font-family="${escapeXML(font)}" font-weight="800" font-size="22" letter-spacing="4" fill="${c.accent}">SEJA BEM-VINDO · ${escapeXML(identity.marca.toUpperCase().slice(0, 16))}</text>
+${titleSvg}
+<rect x="${boxX}" y="${boxY}" width="${boxW}" height="${boxH}" rx="28" fill="${c.surface}" fill-opacity=".92" stroke="${c.primary}" stroke-width="3"/>
+<text x="${cx}" y="${boxY + 52}" text-anchor="middle" font-family="${escapeXML(font)}" font-weight="700" font-size="20" letter-spacing="4" fill="${c.accent}">COMEÇAMOS EM BREVE</text>
+<text x="${cx}" y="${boxY + 148}" text-anchor="middle" font-family="${escapeXML(font)}" font-weight="800" font-size="96" letter-spacing="6" fill="${c.text}">05:00</text>
+<text x="${cx}" y="${Math.round(y1 - 36)}" text-anchor="middle" font-family="${escapeXML(font)}" font-weight="600" font-size="28" fill="${c.muted}">${escapeXML((ev || identity.headlines.subtitulo).slice(0, 64))}</text>
+</svg>\n`;
+  }
 
   const wide = W / H > 1.3;
   const size = Math.round(Math.min(cw / (wide ? 14 : 9.5), H / (wide ? 9 : 14)));
@@ -71,13 +107,16 @@ export function renderLandingHTML(identity, { photo = null, photoFile = null, wh
   const heroBg = photoFile
     ? `linear-gradient(180deg,${c.bg}99,${c.bg}f2),url('${photoFile}') center ${Math.round(identity.focal.hero.y * 100)}%/cover`
     : `linear-gradient(135deg,${c.bg},${c.surface})`;
-  const cards = identity.beneficios.map((b, i) => `<article class="card rv">${icon(i, c.accent)}<h3>${e(b)}</h3></article>`).join('');
+  const cards = identity.beneficios.map((b, i) => `<article class="card rv lp-card" data-reveal>${icon(i, c.accent)}<h3>${e(b)}</h3></article>`).join('');
   const credit = photo?.credit ? `<p class="credit">Foto: ${e(photo.credit)}</p>` : '';
   return `<!doctype html>
 <html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${e(identity.marca)}</title>
 <style>
-:root{--bg:${c.bg};--surface:${c.surface};--primary:${c.primary};--accent:${c.accent};--text:${c.text};--muted:${c.muted};--onp:${c.onPrimary}}
+:root{
+  --bg:${c.bg};--surface:${c.surface};--primary:${c.primary};--accent:${c.accent};--text:${c.text};--muted:${c.muted};--onp:${c.onPrimary};
+  --color-primary:${c.primary};--color-background-main:${c.bg};--color-text-primary:${c.text};--color-text-muted:${c.muted};
+}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:${t.body};line-height:1.55}
 h1,h2,h3{font-family:${t.display};font-weight:${t.weightDisplay};letter-spacing:${t.tracking};margin:0}
 .wrap{max-width:${identity.kit.spacing.containerMax};margin:0 auto;padding:0 24px}
@@ -91,13 +130,22 @@ section.s{padding:${identity.kit.spacing.sectionY} 0}.grid{display:grid;grid-tem
 .credit{color:var(--muted);font-size:.75rem;text-align:center;padding:16px}
 .anim .rv{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease}.anim .rv.in{opacity:1;transform:none}
 @media(prefers-reduced-motion:reduce){.anim .rv{opacity:1;transform:none;transition:none}}
-</style></head><body>
-<header class="hero"><div class="wrap rv"><div style="width:220px;margin-bottom:28px">${identity.logo_svg}</div>
-<h1>${e(identity.headlines.hero)}</h1><p>${e(identity.headlines.subtitulo)}</p><p><a class="btn" href="${wa}">${e(identity.headlines.cta_principal)}</a></p></div></header>
-<section class="s"><div class="wrap"><h2 class="rv">Por que escolher ${e(identity.marca)}</h2><div class="grid">${cards}</div></div></section>
-<section class="cta" id="contato"><h2 class="rv">Vamos conversar sobre o seu projeto?</h2><a class="btn rv" href="${wa}">${e(identity.headlines.cta_principal)}</a></section>
+${CONSTITUTION_CSS}
+</style></head><body class="landing">
+${constitutionShell({ cta: identity.headlines.cta_principal, whatsapp })}
+<header class="lp-header">
+  <div class="wrap" style="display:flex;justify-content:space-between;align-items:center">
+    <div style="height:36px;display:flex;align-items:center">${identity.logo_svg}</div>
+    <a class="btn" style="padding:10px 22px;font-size:.9rem" href="${wa}">${e(identity.headlines.cta_principal)}</a>
+  </div>
+</header>
+<header class="hero"><div class="wrap rv lp-hero-copy"><div style="width:220px;margin-bottom:28px">${identity.logo_svg}</div>
+<h1 data-reveal>${e(identity.headlines.hero)}</h1><p data-reveal>${e(identity.headlines.subtitulo)}</p><p data-reveal><a class="btn cta" href="${wa}">${e(identity.headlines.cta_principal)}</a></p></div></header>
+<section class="s lp-features"><div class="wrap"><h2 class="rv" data-reveal>Por que escolher ${e(identity.marca)}</h2><div class="grid">${cards}</div></div></section>
+<section class="cta lp-cta-band" id="contato"><h2 class="rv" data-reveal>Vamos conversar sobre o seu projeto?</h2><a class="btn rv cta" data-reveal href="${wa}">${e(identity.headlines.cta_principal)}</a></section>
 ${credit}
 <script>
+${CONSTITUTION_JS}
 (function(){var q=new URLSearchParams(location.search);if(q.get('static')==='true')return;
 var d=document.documentElement;d.classList.add('anim');
 if(!('IntersectionObserver' in window)){d.classList.remove('anim');return}

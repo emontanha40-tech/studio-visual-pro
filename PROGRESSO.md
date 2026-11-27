@@ -145,3 +145,10 @@ Diagnosticar a situação de Git e planejar um checkpoint seguro antes de modifi
 
 ## Registro obrigatório ao concluir uma etapa
 Anotar objetivo, arquivos alterados, testes executados e resultado, limitações e próximo passo. Preservar fatos anteriores úteis. Não registrar tokens, senhas ou dados pessoais de terceiros.
+
+## Fechamento Fatia 11 + Fatia 12 — Conferência dos 3 Blocos (2026-11-27)
+- **Objetivo:** Conferir e validar integralmente os 3 blocos concluídos (correção mobile do Hotsite, Constituição Global de Design & Motion e Laboratório de Estilo `/estilo`).
+- **Arquivos conferidos/atualizados:** `src/kit/webTemplates.mjs`, `AGENTS.md`, `GEMINI.md`, `CLAUDE.md`, `docs/CONSTITUICAO-DESIGN-MOTION.md`, `docs/LABORATORIO-ESTILO.md`, `public/estilo.html`, `public/estilo.mjs`, `src/style-lab/`, `tests/styleLab.test.mjs`, `STATUS_ATUAL.md`, `PROGRESSO.md`.
+- **Verificações:** `npm run check` (`node --check` + `tsc --noEmit`) aprovado; suíte completa `npm test` com **127/127** testes passando; auditoria sem segredos expostos; smoke test HTTP 200 nas rotas `/`, `/kit`, `/estilo`, `/website`, `/showcase` e `/api/style-lab/presets` em `http://100.82.176.70:4173`.
+- **Limitações:** alterações no worktree isolado aguardando integração/commit; homologação humana no iPhone e ativação de chaves pagas (`FAL_KEY` / `GEMINI_API_KEY` / `STYLE_LAB_ENABLE_VISION=1`) pendentes.
+- **Próximo passo:** homologar `/estilo` e `/kit` no iPhone via Tailscale ou replicar as regras globais de Design & Motion nos demais projetos do workspace.

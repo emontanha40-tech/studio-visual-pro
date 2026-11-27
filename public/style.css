@@ -84,3 +84,25 @@ textarea.ctl{height:auto;min-height:92px;padding:12px 14px;resize:vertical;line-
   .ctl{font-size:16px}
   .kit .card{padding:20px 16px}
 }
+
+/* ===== Fatia 12: Laboratório de Estilo ===== */
+.lab-tabs{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0 22px}
+.lab-tabs .btn-chip.active{background:#0f5f57;color:#fff;border-color:#0f5f57}
+.lab-swatches{display:flex;flex-wrap:wrap;gap:10px;margin:16px 0}
+.lab-swatch{display:flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid var(--line);border-radius:999px;background:#fafaf8}
+.lab-swatch span{width:20px;height:20px;border-radius:50%;border:1px solid rgba(0,0,0,.15);flex:none}
+.lab-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:16px 0}
+.lab-metric{padding:12px 14px;border-radius:10px;background:#f4f6f4;border:1px solid var(--line)}
+.lab-metric strong{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.7px;color:#5a6b6e;margin-bottom:4px}
+.lab-metric span{font-size:14px;font-weight:600;color:var(--ink);overflow-wrap:anywhere}
+.lab-keyframes{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin:16px 0}
+.lab-keyframes figure{margin:0;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#111}
+.lab-keyframes img{display:block;width:100%;height:110px;object-fit:cover}
+.lab-keyframes figcaption{padding:6px 10px;font-size:12px;color:#e5e7eb;background:#161b22}
+.lab-json{max-height:280px;overflow:auto;padding:14px;border-radius:10px;background:#0f172a;color:#e2e8f0;font-size:12px;line-height:1.45}
+.lab-preset-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:14px;margin-top:16px}
+.lab-preset-card{padding:16px;border:1px solid var(--line);border-radius:12px;background:#fafaf8}
+.lab-preset-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.lab-preset-head h3{margin:0;font-size:16px}
+.lab-mini-swatches{display:flex;gap:6px;margin:12px 0}
+.lab-mini-swatches i{width:24px;height:24px;border-radius:50%;border:1px solid rgba(0,0,0,.15);display:inline-block}

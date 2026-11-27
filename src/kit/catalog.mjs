@@ -17,6 +17,9 @@ export const CATEGORIES = [
 
 export const KIT_PIECES = [
   { id: 'landing', category: 'web', name: 'Landing Page', width: 1440, height: null, format: 'html', note: 'Use ?static=true para desligar animações (Auditor Visual).' },
+  { id: 'linktree', category: 'web', name: 'Página de Bio / Linktree Pro', width: 430, height: null, format: 'html', note: 'Mobile-first com botões animados e identidade da campanha.' },
+  { id: 'hotsite', category: 'web', name: 'Hotsite de Evento / Programação Completa', width: 1440, height: null, format: 'html', note: 'Cronograma interativo em abas/acordeão e bloco de localização.' },
+  { id: 'email-kit', category: 'web', name: 'Assinatura de E-mail + Cabeçalho de Newsletter', width: 640, height: null, format: 'html', note: 'HTML pronto para copiar e colar em clientes de e-mail.' },
   { id: 'feed', category: 'social', name: 'Feed 4:5', width: 1080, height: 1350, format: 'svg', safe: { t: 0.05, r: 0.05, b: 0.05, l: 0.05 } },
   { id: 'story', category: 'social', name: 'Story 9:16', width: 1080, height: 1920, format: 'svg', safe: { t: 250 / 1920, r: 0.06, b: 340 / 1920, l: 0.06 }, note: 'Zonas livres: 250px topo, 340px base.' },
   { id: 'whatsapp', category: 'social', name: 'WhatsApp 1:1', width: 1080, height: 1080, format: 'svg', safe: { t: 0.06, r: 0.06, b: 0.06, l: 0.06 } },
@@ -24,6 +27,8 @@ export const KIT_PIECES = [
   { id: 'screen', category: 'projecao', name: 'Telão 16:9 (overscan 10%)', width: 1920, height: 1080, format: 'svg', safe: { t: 0.1, r: 0.1, b: 0.1, l: 0.1 }, note: 'Conteúdo dentro de 10% de overscan.' },
   { id: 'slide-capa', category: 'projecao', name: 'Slide de Série — capa com título', width: 1920, height: 1080, format: 'svg', safe: { t: 0.1, r: 0.1, b: 0.1, l: 0.1 } },
   { id: 'slide-fundo', category: 'projecao', name: 'Slide de Série — fundo limpo (letras)', width: 1920, height: 1080, format: 'svg', safe: { t: 0.1, r: 0.1, b: 0.1, l: 0.1 }, note: 'Sem texto: para letras e projeção.' },
+  { id: 'lower-third', category: 'projecao', name: 'Lower Third (tarja transparente)', width: 1920, height: 1080, format: 'svg', transparent: true, safe: { t: 0.1, r: 0.1, b: 0.08, l: 0.06 }, note: 'Tarja de transmissão 1920×1080 PNG com fundo transparente.' },
+  { id: 'welcome-countdown', category: 'projecao', name: 'Tela de Boas-Vindas / Contagem Regressiva', width: 1920, height: 1080, format: 'svg', safe: { t: 0.1, r: 0.1, b: 0.1, l: 0.1 }, note: 'Abertura 1920×1080 com overscan 10%.' },
   printPiece('invitation', 'Convite frente e verso', 100, 150, { sides: ['frente', 'verso'] }),
   printPiece('prayer', 'Bloco de Oração', 148, 210),
   printPiece('decision', 'Cartão de Decisão', 148, 105),
@@ -33,8 +38,9 @@ export const KIT_PIECES = [
 ];
 
 export const PRESETS = [
-  { id: 'culto-serie', name: 'Kit Culto / Série', pieces: ['feed', 'story', 'whatsapp', 'screen', 'slide-capa', 'slide-fundo'] },
-  { id: 'lancamento', name: 'Kit Lançamento', pieces: ['landing', 'feed', 'story', 'whatsapp', 'banner'] },
+  { id: 'culto-serie', name: 'Kit Culto / Série', pieces: ['feed', 'story', 'whatsapp', 'screen', 'slide-capa', 'slide-fundo', 'lower-third', 'welcome-countdown'] },
+  { id: 'lancamento', name: 'Kit Lançamento', pieces: ['landing', 'linktree', 'email-kit', 'feed', 'story', 'whatsapp', 'banner'] },
+  { id: 'evento-completo', name: 'Kit Evento Completo', pieces: ['landing', 'linktree', 'hotsite', 'email-kit', 'feed', 'story', 'screen', 'lower-third', 'welcome-countdown'] },
 ];
 
 export function resolvePieces({ pieces, preset } = {}) {

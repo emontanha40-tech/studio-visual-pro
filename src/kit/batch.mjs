@@ -3,6 +3,7 @@ import { resolvePieces } from './catalog.mjs';
 import { buildIdentity } from './identity.mjs';
 import { resolvePhoto } from './photos.mjs';
 import { renderPieceSVG, renderLandingHTML } from './render.mjs';
+import { renderLinktreeHTML, renderHotsiteHTML, renderEmailKitHTML } from './webTemplates.mjs';
 import { renderPrintPieces } from './print.mjs';
 import { renderSvgPngs, RETINA } from './raster.mjs';
 import { TEASER_FORMATS, renderTeaser } from './teaser.mjs';
@@ -18,9 +19,9 @@ export async function buildKit(input = {}, { photoResolver = resolvePhoto, now =
   const photo = await photoResolver({ nicho: identity.nicho });
   const printed = await renderPrintPieces(pieces.filter((p) => p.format === 'print'), identity);
   const svgs = new Map(pieces.filter((p) => p.format === 'svg').map((p) => [
-    p.id, renderPieceSVG(p, identity, p.id === 'slide-fundo' || p.id === 'screen' ? null : photo)]));
+    p.id, renderPieceSVG(p, identity, p.id === 'slide-fundo' || p.id === 'screen' || p.transparent ? null : photo)]));
   const pngs = await rasterizer(pieces.filter((p) => svgs.has(p.id))
-    .map((p) => ({ id: p.id, width: p.width, height: p.height, svg: svgs.get(p.id) })));
+    .map((p) => ({ id: p.id, width: p.width, height: p.height, svg: svgs.get(p.id), transparent: Boolean(p.transparent) })));
   const entries = [];
   const items = [];
   for (const p of pieces) {
@@ -40,12 +41,29 @@ export async function buildKit(input = {}, { photoResolver = resolvePhoto, now =
         sangria_final_mm: p.print.bleedMm, escala: `1:${p.print.scale}`, dpi: p.print.dpi,
         png_px: { largura: pixelWidth, altura: pixelHeight }, gabarito_provisorio: p.print.provisional,
       });
-    } else if (p.id === 'landing') {
+    } else if (p.id === 'landing' || p.id === 'linktree' || p.id === 'hotsite') {
       const photoFile = photo ? `foto-base.${photo.mime === 'image/png' ? 'png' : 'jpg'}` : null;
-      const html = renderLandingHTML(identity, { photo, photoFile, whatsapp: input.whatsapp });
-      entries.push({ name: `${dir}/landing/index.html`, data: html });
-      if (photo) entries.push({ name: `${dir}/landing/${photoFile}`, data: photo.bytes });
-      items.push({ id: p.id, arquivo: `${dir}/landing/index.html`, sha256: sha(html) });
+      const html = p.id === 'landing'
+        ? renderLandingHTML(identity, { photo, photoFile, whatsapp: input.whatsapp })
+        : p.id === 'linktree'
+          ? renderLinktreeHTML(identity, { photo, photoFile, whatsapp: input.whatsapp })
+          : renderHotsiteHTML(identity, { photo, photoFile, whatsapp: input.whatsapp, programacao: input.programacao });
+      entries.push({ name: `${dir}/${p.id}/index.html`, data: html });
+      if (photo) entries.push({ name: `${dir}/${p.id}/${photoFile}`, data: photo.bytes });
+      items.push({ id: p.id, arquivo: `${dir}/${p.id}/index.html`, sha256: sha(html) });
+    } else if (p.id === 'email-kit') {
+      const { previewHtml, signatureHtml, newsletterHeaderHtml } = renderEmailKitHTML(identity);
+      entries.push(
+        { name: `${dir}/email-kit/index.html`, data: previewHtml },
+        { name: `${dir}/email-kit/assinatura-email.html`, data: signatureHtml },
+        { name: `${dir}/email-kit/cabecalho-newsletter.html`, data: newsletterHeaderHtml },
+      );
+      items.push({
+        id: p.id,
+        arquivo: `${dir}/email-kit/index.html`,
+        arquivos: [`${dir}/email-kit/index.html`, `${dir}/email-kit/assinatura-email.html`, `${dir}/email-kit/cabecalho-newsletter.html`],
+        sha256: sha(previewHtml),
+      });
     } else {
       const svg = svgs.get(p.id);
       const base = `${dir}/${p.id}-${p.width}x${p.height}`;

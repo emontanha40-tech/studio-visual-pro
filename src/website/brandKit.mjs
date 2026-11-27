@@ -33,6 +33,22 @@ export const BRAND_KITS = {
     spacing: { sectionY: '72px', cardRadius: '20px', containerMax: '1120px' },
     contrast: { minRatio: 4.5, mode: 'dark' },
   },
+  'ministerial-serie': {
+    id: 'ministerial-serie',
+    nome: 'Ministerial / Série',
+    colors: { bg: '#120b18', surface: '#1e1329', primary: '#e5a93c', accent: '#f6d086', secondary: '#8b3a62', success: '#34d399', text: '#fbf8f3', muted: '#c7b8d2' },
+    typography: { display: 'Georgia, "Times New Roman", serif', body: 'Inter, system-ui, sans-serif', weightDisplay: 700, tracking: '-0.02em' },
+    spacing: { sectionY: '92px', cardRadius: '20px', containerMax: '1060px' },
+    contrast: { minRatio: 4.5, mode: 'dark' },
+  },
+  'minimalista-suico': {
+    id: 'minimalista-suico',
+    nome: 'Minimalista Suíço',
+    colors: { bg: '#f7f7f5', surface: '#ffffff', primary: '#c81e1e', accent: '#111111', secondary: '#4b5563', success: '#15803d', text: '#111111', muted: '#4b5563' },
+    typography: { display: 'Inter, "Helvetica Neue", Arial, sans-serif', body: 'Inter, system-ui, sans-serif', weightDisplay: 800, tracking: '-0.04em' },
+    spacing: { sectionY: '84px', cardRadius: '4px', containerMax: '1140px' },
+    contrast: { minRatio: 4.5, mode: 'light' },
+  },
 };
 
 function escXml(str) {
@@ -60,8 +76,11 @@ export function generateParametricSvgLogo(marca, kit) {
  * Extração Semântica Estruturada (AST/JSON) a partir do Briefing do cliente.
  */
 export function extractSemanticBriefing(input = {}) {
-  const modelo = BRAND_KITS[input.modelo] ? input.modelo : 'tech-cinematografico';
-  const brandKit = BRAND_KITS[modelo];
+  const customKit = input.custom_brand_kit && typeof input.custom_brand_kit === 'object' && input.custom_brand_kit.colors
+    ? input.custom_brand_kit
+    : null;
+  const modelo = customKit ? (customKit.id || input.modelo || 'custom-estilo') : (BRAND_KITS[input.modelo] ? input.modelo : 'tech-cinematografico');
+  const brandKit = customKit || BRAND_KITS[modelo];
   const marca = String(input.marca || 'Connect').trim();
   const nicho = String(input.nicho || input.subtitulo_marca || 'Soluções Tecnológicas').trim();
   const diferencial = String(input.diferencial || 'automação personalizada para sua necessidade real').trim();
@@ -70,7 +89,12 @@ export function extractSemanticBriefing(input = {}) {
     schema_version: '2.0',
     slug: String(input.slug || marca.toLowerCase().replace(/[^a-z0-9]+/g, '-')).replace(/^-|-$/g, '') || 'site-gerado',
     brand_kit: brandKit,
-    tom_de_voz: modelo === 'editorial-clean' ? 'executivo-sofisticado' : modelo === 'comercial-conversao' ? 'direto-persuasivo' : 'inovador-cinematografico',
+    tom_de_voz: {
+      'editorial-clean': 'executivo-sofisticado',
+      'comercial-conversao': 'direto-persuasivo',
+      'ministerial-serie': 'acolhedor-inspirador',
+      'minimalista-suico': 'preciso-minimalista',
+    }[modelo] || 'inovador-cinematografico',
     headlines: {
       hero: String(input.slogan || `${marca}: conectando você ao que há de melhor.`).trim(),
       subtitulo: String(input.subtitulo || `${nicho} com ${diferencial}.`).trim(),

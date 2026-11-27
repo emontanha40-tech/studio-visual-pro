@@ -103,3 +103,16 @@
 
 Consultar docs/METODO-AGENTES.md e docs/ROTEIRO-PDF.md quando necessário. Não tratar instruções instaladas como comprovação de backup, isolamento entre clientes, segurança ou produto pronto.
 <!-- /rotina-terminal-agentes-v1 -->
+
+<!-- constituicao-design-motion-v1 -->
+## Constituição Padrão de Interface, Design & Motion (Obrigatória em Projetos Web/SaaS)
+
+Aplicar como padrão permanente e obrigatório em 100% dos sites, landing pages, hotsites, linktrees e interfaces web/SaaS gerados pelos agentes, sem depender de pedido no briefing (especificação completa em `docs/CONSTITUICAO-DESIGN-MOTION.md` e implementação de referência em `src/engine/design-constitution.mjs`):
+
+- **Glassmorphism:** cabeçalho fixo flutuante com `backdrop-filter: blur(16px) saturate(1.5)` (e `-webkit-`), estado compacto ao rolar e barra de progresso de scroll na cor primária.
+- **Hero Cinematográfico (Stagger + Blur-to-Sharp):** entrada em cascata (`130ms`), transição de desfoque para nítido (`blur(14px)` → `blur(0)`) e parallax suave na mídia.
+- **Scroll Cinematográfico (`IntersectionObserver`):** revelação progressiva (`[data-reveal]`) com `opacity`, `translateY` e `scale` sutil; hero visível sem depender de rolagem.
+- **Micro-interações Táteis & Glow:** curva padrão obrigatória `cubic-bezier(0.16, 1, 0.3, 1)`, elevação/glow em CTAs e cards reativos ao ponteiro, foco visível por teclado e FAQ/drawer fluidos.
+- **Contraste WCAG AA & Responsividade:** contraste mínimo WCAG AA (4.5:1 texto normal / 3:1 texto grande e controles), tipografia fluida com `clamp()` e zero overflow horizontal no mobile (ex.: `390px`).
+- **Fail-safe & Honestidade:** sem JS, com `?static=true` ou `prefers-reduced-motion: reduce`, 100% do conteúdo fica visível sem bloqueios; nunca simular envio, integração ou pagamento real sem backend conectado.
+<!-- /constituicao-design-motion-v1 -->

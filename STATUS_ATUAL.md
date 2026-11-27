@@ -35,3 +35,24 @@
 - Concluído: sidebar única (`public/shell.mjs`) aplicada em `/`, `/kit`, `/website` e `/showcase` com os 7 itens (`01 Briefing` a `07 Kit em Lote`), destaque de rota ativa e menu recolhível no mobile; remoção do aviso legado da tela principal; redesign da tela `/kit` com grid responsivo de 2 colunas, labels superiores em caixa alta, inputs `44px`, card **Briefing Inteligente (1 Clique)** conectado a `POST /api/kit/ai-fill`, hierarquia de botões com SVG e peças selecionáveis em grid de cards (3/2/1 colunas).
 - Validação: `npm run check` + **109/109** testes passando (`tests/kit.test.mjs`), serviço `studio-visual-pro.service` reiniciado e smoke test HTTP 200 nas rotas `/`, `/kit`, `/website`, `/showcase` e `/shell.mjs`.
 - Falta: homologação visual no iPhone (`http://100.82.176.70:4173/kit`) e teste real do fluxo completo de geração de lote.
+
+## Fatia 11 — Bloco 1/3: Constituição Visual & Motion (2026-11-27)
+- Concluído: `src/engine/design-constitution.mjs` (CSS+JS+shell) injetado em toda landing (`generateHtml`, `generateLandingPackage`): header glass com progresso de scroll, hero stagger blur-to-sharp + parallax, reveal opacity/translateY/scale, shimmer/glow nos cards, FAQ animado, cronograma opcional (`schedule`), drawer de inscrição (sem envio falso; WhatsApp só se `whatsapp` informado). `?static=true`/reduced-motion = tudo visível.
+- Testes: 113/113 + `npm run check` limpo; smoke em Chromium sem erros JS. Novo: `tests/designConstitution.test.mjs`.
+
+## Fatia 11 — Bloco 2/3: Expansão WEB, Projeção e 5 Modelos Visuais (2026-11-27)
+- Concluído: `src/kit/webTemplates.mjs` (Linktree Pro mobile-first e Hotsite de Evento com abas/acordeão/localização usando Constituição Visual & Motion + Kit de E-mail com Assinatura HTML e Cabeçalho de Newsletter copiáveis); `src/kit/render.mjs` + `src/kit/raster.mjs` (Lower Third 1920×1080 PNG RGBA com fundo transparente via `omitBackground: true` + Tela de Boas-Vindas / Contagem Regressiva 1920×1080); `src/website/brandKit.mjs` + `public/kit.html` + `server.mjs` (5 direções de arte: Editorial Luxo, Tech Cinema, Alta Conversão, Ministerial / Série e Minimalista Suíço).
+- Testes: `tests/kitExpansion.test.mjs` + suíte completa + `npm run check`.
+- Falta: Bloco 3/3 da Fatia 11 e homologação visual no iPhone.
+
+## Fatia 11 — Bloco 3/3: Homologação E2E em Chromium
+- `npm run homologar` inicia o Studio em loopback, preenche o briefing fictício e baixa o ZIP das 19 peças com teaser. Requer Node 22+, Chromium do Playwright, Python 3, FFmpeg com libx264 e ffprobe.
+- Validação local aprovada: 118/118 testes, `npm run check`, PNG Retina 2×, oito PDFs, teaser H.264 de 60 s e interações nos três sites. Relatório e oito capturas em `output/homologacao/`.
+- Inspeção da captura móvel: logo do cabeçalho do Hotsite fica truncado a 390 px. Revisão visual em iPhone/Dell e reinício do serviço principal pendentes da integração fora do worktree.
+
+## Fechamento Fatia 11 + Fatia 12 — Consolidação dos 3 Blocos ✅ (2026-11-27)
+- **Bloco 1/3 (Hotsite Mobile 390px):** cabeçalho mobile corrigido em `src/kit/webTemplates.mjs` (logo flexível, botão compacto e quebra de texto sem overflow horizontal), coberto por `tests/kitExpansion.test.mjs`.
+- **Bloco 2/3 (Regra Global de Design & Motion):** Constituição Padrão de Interface, Design & Motion registrada permanentemente em `AGENTS.md`, `GEMINI.md`, `CLAUDE.md` e `docs/CONSTITUICAO-DESIGN-MOTION.md`.
+- **Bloco 3/3 (Fatia 12 — Laboratório de Estilo):** rota `/estilo` (`public/estilo.html`, `public/estilo.mjs`), extratores de URL, imagem e vídeo (`src/style-lab/`), persistência SQLite, integração com `/kit` e documentação em `docs/LABORATORIO-ESTILO.md` (`tests/styleLab.test.mjs`).
+- **Validação final:** `npm run check` (`tsc --noEmit` + sintaxe) OK, **127/127** testes passando, zero segredos expostos, rotas ao vivo HTTP 200 em `http://100.82.176.70:4173/kit` e `http://100.82.176.70:4173/estilo`.
+- **Falta fazer:** homologação visual no iPhone em `/kit` e `/estilo`; configurar `FAL_KEY` / `GEMINI_API_KEY` (e `STYLE_LAB_ENABLE_VISION=1` quando autorizado orçamento) para testes com IA paga; replicação opcional das regras globais fora do repositório.

@@ -47,7 +47,7 @@ export function buildIdentity(input = {}) {
   checks.push({ papel: 'onPrimary', fundo: 'primary', ratio: Number(contrastRatio(onPrimary, colors.primary).toFixed(2)), ok: true });
 
   const fonte = FONT_STACKS[input.fonte] ? input.fonte : (ast.brand_kit.typography.display.includes('Georgia') ? 'serif' : 'sans');
-  const kit = { ...ast.brand_kit, colors, typography: { ...ast.brand_kit.typography, display: FONT_STACKS[fonte] } };
+  const kit = { ...ast.brand_kit, colors, typography: { ...ast.brand_kit.typography, display: ast.brand_kit.custom && !FONT_STACKS[input.fonte] ? ast.brand_kit.typography.display : FONT_STACKS[fonte] } };
   const marca = String(input.marca || 'Connect').trim();
   const evento = {
     data: String(input.data || '').slice(0, 80),
@@ -64,6 +64,12 @@ export function buildIdentity(input = {}) {
     focal: ast.focal_points,
     evento,
     beneficios: normalizarBeneficios(input.beneficios),
+    whatsapp: /^\d{10,15}$/.test(String(input.whatsapp || '').replace(/\D/g, '')) ? String(input.whatsapp).replace(/\D/g, '') : '',
+    inicio: /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(String(input.inicio || '')) && !Number.isNaN(Date.parse(input.inicio)) ? String(input.inicio).slice(0, 19) : '',
+    programacao: linhas(input.programacao, 24).map(({ c }) => (c.length === 2 ? { dia: '', hora: c[0], titulo: c[1] } : { dia: c[0], hora: c[1], titulo: c[2], descricao: c[3] || '' }))
+      .filter((p) => p.titulo),
+    depoimentos: linhas(input.depoimentos, 6).filter(({ c }) => c.length >= 2).map(({ c }) => ({ nome: c[0], texto: c[1] })),
+    faq: linhas(input.faq, 8).filter(({ c }) => c.length >= 2).map(({ c }) => ({ pergunta: c[0], resposta: c[1] })),
     contraste: checks,
     avisos,
   };
@@ -74,4 +80,12 @@ function normalizarBeneficios(list) {
   const padrao = ['Atendimento próximo e humano', 'Processo claro, sem surpresas', 'Resultado que você acompanha'];
   while (base.length < 3) base.push(padrao[base.length]);
   return base;
+}
+
+/** Texto livre "a | b | c" (uma linha por item) ou array de strings → [{c: colunas}]. Só dados do briefing, nunca inventados. */
+function linhas(v, max) {
+  const src = Array.isArray(v) ? v : String(v || '').split(/\r?\n/);
+  return src.map((l) => String(l).trim().slice(0, 300)).filter(Boolean).slice(0, max)
+    .map((l) => ({ c: l.split('|').map((x) => x.trim()).filter((x, i, a) => x || i < a.length - 1).slice(0, 4) }))
+    .filter(({ c }) => c.length >= 2 || (c.length === 1 && c[0]));
 }

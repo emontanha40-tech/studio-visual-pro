@@ -13,9 +13,36 @@ export const TEASER_FORMATS = {
   '16:9': { width: 1280, height: 720 },
 };
 const SCENE_SECONDS = 10;
+const TARGET_TOTAL_SECONDS = 60;
 const FPS = 24;
 const TRANSITION_FRAMES = 12;
 const MAX_PHOTO_BYTES = 3 * 1024 * 1024;
+
+/**
+ * Resolve ritmo do teaser (duração por cena e frames de transição) usando DNA de vídeo se presente.
+ */
+export function resolveTeaserTiming(identity, baseScenes) {
+  const teaserDna = identity?.kit?.teaser;
+  if (!teaserDna || !Number.isFinite(Number(teaserDna.avg_scene_seconds))) {
+    return {
+      scenes: baseScenes,
+      sceneSeconds: SCENE_SECONDS,
+      transitionFrames: TRANSITION_FRAMES,
+      totalSeconds: baseScenes.length * SCENE_SECONDS,
+    };
+  }
+  const avgSec = Math.max(1.5, Math.min(12, Number(teaserDna.avg_scene_seconds)));
+  const transitionFrames = Math.max(4, Math.min(20, Number(teaserDna.transition_frames) || TRANSITION_FRAMES));
+  const targetCount = Math.max(baseScenes.length, Math.min(24, Math.round(TARGET_TOTAL_SECONDS / avgSec)));
+  const scenes = Array.from({ length: targetCount }, (_, i) => baseScenes[i % baseScenes.length]);
+  const sceneSeconds = Number((TARGET_TOTAL_SECONDS / scenes.length).toFixed(3));
+  return {
+    scenes,
+    sceneSeconds,
+    transitionFrames,
+    totalSeconds: TARGET_TOTAL_SECONDS,
+  };
+}
 const run = promisify(execFile);
 const escapeHtml = (s) => String(s).replace(/[&<>"']/g, (c) => ({
   '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
@@ -92,7 +119,8 @@ export async function renderTeaser(input, format) {
 
   const { width, height } = TEASER_FORMATS[format];
   const identity = buildIdentity(input);
-  const scenes = teaserScenes(input, identity);
+  const timing = resolveTeaserTiming(identity, teaserScenes(input, identity));
+  const scenes = timing.scenes;
   const photo = await resolvePhoto({ nicho: identity.nicho });
   const html = await makeHtml(identity, scenes, photo, format);
   const dir = await mkdtemp(path.join(tmpdir(), 'studio-teaser-'));
@@ -128,11 +156,12 @@ export async function renderTeaser(input, format) {
 
       for (let i = 0; i < scenes.length; i++) {
         if (i) {
-          for (let frame = 0; frame < TRANSITION_FRAMES; frame++) {
-            await capture(i, frame / TRANSITION_FRAMES, 2 / FPS);
+          for (let frame = 0; frame < timing.transitionFrames; frame++) {
+            await capture(i, frame / timing.transitionFrames, 2 / FPS);
           }
         }
-        await capture(i, 1, SCENE_SECONDS - (i ? TRANSITION_FRAMES * 2 / FPS : 0));
+        const holdDuration = Math.max(0.25, timing.sceneSeconds - (i ? timing.transitionFrames * 2 / FPS : 0));
+        await capture(i, 1, holdDuration);
       }
     } finally {
       await browser.close();
@@ -143,7 +172,7 @@ export async function renderTeaser(input, format) {
     await writeFile(path.join(dir, 'frames.txt'), list.join('\n') + '\n');
     await run(ffmpeg, [
       '-hide_banner', '-loglevel', 'error', '-nostdin', '-f', 'concat', '-safe', '0', '-i', 'frames.txt',
-      '-vf', `fps=${FPS}`, '-t', String(scenes.length * SCENE_SECONDS), '-c:v', 'libx264',
+      '-vf', `fps=${FPS}`, '-t', String(timing.totalSeconds), '-c:v', 'libx264',
       '-preset', 'ultrafast', '-threads', '2', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', 'teaser.mp4',
     ], { cwd: dir, timeout: 120000 });
     return await readFile(path.join(dir, 'teaser.mp4'));

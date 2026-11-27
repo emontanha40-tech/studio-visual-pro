@@ -5,6 +5,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { resolveFontPair, FONT_CATALOG } from './fontCatalog.mjs';
 import { logoInline, buildLogoSvg, escapeXml } from './logo.mjs';
+import { CONSTITUTION_CSS, CONSTITUTION_JS, constitutionShell } from '../engine/design-constitution.mjs';
 import { contrastRatio, DARK_TEXT, LIGHT_TEXT } from './brandTokens.mjs';
 
 export const PROJECT_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
@@ -99,6 +100,12 @@ function renderTestimonials(list) {
     `<blockquote data-reveal><p>“${escapeXml(text)}”</p><cite>— ${escapeXml(name)}</cite></blockquote>`).join('')}</div>`;
 }
 
+function renderSchedule(list) {
+  if (!Array.isArray(list) || !list.length) return '';
+  return `<section class="lp-extra"><div class="lp-wrap"><h2 class="lp-sec-title" data-reveal>Programação</h2><ol class="dc-timeline">${list.slice(0, 12).map((it) =>
+    `<li><time>${escapeXml(it.time || '')}</time><div><h3>${escapeXml(it.title || '')}</h3>${it.text ? `<p class="muted">${escapeXml(it.text)}</p>` : ''}</div></li>`).join('')}</ol></div></section>`;
+}
+
 function renderLandingExtras(archetype, options, features) {
   if (archetype === 'saas_modern') {
     return `<section class="lp-wrap lp-metrics" aria-label="Resumo da solução" data-reveal>
@@ -143,10 +150,10 @@ function renderLandingBody(t, o) {
     ? `<div class="lp-media lp-photo" data-reveal style="--i:2"><img data-parallax class="hero-img" src="${escapeXml(o.imageUrl)}" style="object-position:${clampPct(o.focalX)}% ${clampPct(o.focalY)}%" alt="" loading="eager" decoding="async">${o.photoCredit ? `<small class="lp-credit">${escapeXml(o.photoCredit)}</small>` : ''}</div>`
     : `<div class="lp-media lp-geo" data-reveal style="--i:2"><i class="lp-orb lp-orb1"></i><i class="lp-orb lp-orb2"></i><div class="lp-geo-card" data-parallax><span class="lp-geo-tag">${escapeXml(o.tagline || o.subtitle || 'Design modular orientado por Brand Tokens')}</span></div></div>`;
 
-  return `<div class="landing lp-${archetype}">
+  return `${constitutionShell(o)}<div class="landing lp-${archetype}">
 <header class="lp-header"><div class="lp-wrap lp-nav"><div class="logo lp-logo">${logoInline(t)}</div><a class="cta lp-nav-cta" href="#contato">${escapeXml(o.cta)}</a></div></header>
 <section class="lp-hero"><div class="lp-wrap lp-hero-grid">
-  <div class="lp-hero-copy" data-reveal>${badge}<h1>${escapeXml(o.headline)}</h1><p class="muted lp-sub">${escapeXml(o.subtitle)}</p><div class="lp-actions"><a class="cta lp-cta" href="#contato">${escapeXml(o.cta)}</a></div></div>
+  <div class="lp-hero-copy">${badge}<h1>${escapeXml(o.headline)}</h1><p class="muted lp-sub">${escapeXml(o.subtitle)}</p><div class="lp-actions"><a class="cta lp-cta" href="#contato">${escapeXml(o.cta)}</a></div></div>
   ${heroMedia}
 </div></section>
 ${archetype === 'saas_modern' ? renderLandingExtras(archetype, o, features) : ''}
@@ -154,6 +161,7 @@ ${archetype === 'saas_modern' ? renderLandingExtras(archetype, o, features) : ''
   <h2 class="lp-sec-title" data-reveal>${escapeXml(o.sectionTitle || sectionTitle)}</h2>
   <div class="lp-grid">${features.map((f, i) => `<article class="card lp-card" data-reveal style="--i:${i + 1}">${featureIcon(f.title, i)}<h3>${escapeXml(f.title)}</h3><p class="muted">${escapeXml(f.text)}</p></article>`).join('')}</div>
 </div></section>
+${renderSchedule(o.schedule)}
 ${archetype === 'local_authority' || archetype === 'product_launch' ? renderLandingExtras(archetype, o, features) : ''}
 ${archetype !== 'local_authority' && o.testimonials?.length ? `<section class="lp-extra"><div class="lp-wrap lp-testimonials card">${renderTestimonials(o.testimonials)}</div></section>` : ''}
 <section class="lp-cta-band" id="contato" style="--on-primary:${onPrimary(t)}"><div class="lp-wrap lp-cta-box" data-reveal>
@@ -219,38 +227,8 @@ html:not(.is-static) .landing .cta:hover{box-shadow:0 0 24px color-mix(in srgb,v
 @keyframes faq-in{from{opacity:0;translate:0 -4px}to{opacity:1;translate:0 0}}
 @media (prefers-reduced-motion:reduce){.lp-orb{animation:none}.lp-card,.landing .cta{transition:none}}`;
 
-// Micro-runtime (sem dependências). ?static=true / data-static / reduced-motion → tudo visível sem esperar scroll.
-export const MOTION_JS = `(() => {
-  const root = document.documentElement;
-  if (new URLSearchParams(location.search).get('static') === 'true' /* ?static=true */ || root.hasAttribute('data-static') ||
-      matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) {
-    root.classList.add('is-static');
-    return;
-  }
-  root.classList.add('js-motion');
-  const observer = new IntersectionObserver((entries) => {
-    for (const entry of entries) {
-      if (!entry.isIntersecting) continue;
-      entry.target.classList.add('is-in');
-      observer.unobserve(entry.target);
-    }
-  }, { threshold: 0, rootMargin: '0px 0px -18px 0px' });
-  document.querySelectorAll('[data-reveal]').forEach((element) => observer.observe(element));
-  const layers = document.querySelectorAll('[data-parallax]');
-  if (!layers.length) return;
-  let queued = false;
-  function update() {
-    queued = false;
-    const offset = Math.min(Math.max(window.scrollY, 0) * 0.12, 36);
-    layers.forEach((layer) => layer.style.setProperty('--parallax', offset + 'px'));
-  }
-  addEventListener('scroll', () => {
-    if (queued) return;
-    queued = true;
-    requestAnimationFrame(update);
-  }, { passive: true });
-  update();
-})();`; // ?static=true
+// Runtime de motion pertence à Constituição (obrigatório em todo site gerado). ?static=true desliga tudo.
+export const MOTION_JS = CONSTITUTION_JS;
 
 
 const EDITORIAL_CSS = `
@@ -366,7 +344,7 @@ const TEMPLATE_CSS = `
 .lp-product_launch .lp-card:nth-child(3){justify-self:end}
 .lp-product_launch .lp-cta-box{display:block;padding-block:64px;text-align:center}
 @media(max-width:680px){.lp-wrap{padding-inline:20px}.lp-hero{padding-block:48px}.lp-hero-copy h1{font-size:clamp(31px,9vw,52px)}.lp-saas_modern .lp-hero-grid,.lp-saas_modern .lp-grid,.lp-local-grid{grid-template-columns:1fr}.lp-saas_modern .lp-card:first-child{grid-row:auto;min-height:180px}.lp-metrics{gap:8px;font-size:13px}.lp-media{min-height:250px}.lp-nav{gap:12px}.lp-nav-cta{padding:9px 12px}.lp-local_authority .lp-hero{padding-block:48px}}
-@media (max-width:860px){.lp-hero-grid,.lp-grid{grid-template-columns:1fr}.lp-cta-box{flex-direction:column;align-items:flex-start}}${MOTION_CSS}${EDITORIAL_CSS}`;
+@media (max-width:860px){.lp-hero-grid,.lp-grid{grid-template-columns:1fr}.lp-cta-box{flex-direction:column;align-items:flex-start}}${MOTION_CSS}${EDITORIAL_CSS}${CONSTITUTION_CSS}`;
 
 /**
  * @param tokens tokens validados

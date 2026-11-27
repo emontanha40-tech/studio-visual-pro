@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Studio Visual Pro · Laboratório de Estilo</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <main class="kit style-lab">
+    <header>
+      <div>
+        <p class="eyebrow">08 · LABORATÓRIO DE ESTILO</p>
+        <h1>Engenharia reversa de DNA Visual &amp; Motion</h1>
+        <p class="lead">Extraia paleta, tipografia, espaçamentos, curvas CSS e ritmo de cortes de referências reais e salve como Preset no Modelo Visual do Kit em Lote.</p>
+      </div>
+    </header>
+
+    <section class="card" id="lab-extrator">
+      <h2>1. Escolha a referência para extrair o DNA</h2>
+      <div class="lab-tabs" role="tablist" aria-label="Tipo de referência">
+        <button type="button" class="btn btn-chip active" role="tab" aria-selected="true" data-tab="url">URL de Website</button>
+        <button type="button" class="btn btn-chip" role="tab" aria-selected="false" data-tab="image">Imagem de Arte</button>
+        <button type="button" class="btn btn-chip" role="tab" aria-selected="false" data-tab="video">Vídeo Referência MP4</button>
+      </div>
+
+      <div class="lab-panel" id="panel-url">
+        <div class="field">
+          <label class="lbl" for="sl-url">URL pública do site de referência</label>
+          <input class="ctl" id="sl-url" type="url" placeholder="https://linear.app ou https://stripe.com" maxlength="300">
+        </div>
+        <p class="muted">Playwright inspeciona o DOM real e Computed Styles: paleta, fontes, escala tipográfica, border-radius, sombras e curvas CSS.</p>
+        <div class="row">
+          <button type="button" id="sl-btn-url" class="btn btn-primary">Extrair DNA do Site</button>
+          <span id="sl-status-url" class="muted" role="status" aria-live="polite"></span>
+        </div>
+      </div>
+
+      <div class="lab-panel" id="panel-image" hidden>
+        <div class="field">
+          <label class="lbl" for="sl-image">Imagem de arte (PNG, JPG ou WebP — máx. 8 MB)</label>
+          <input class="ctl" id="sl-image" type="file" accept="image/png,image/jpeg,image/webp">
+        </div>
+        <p class="muted">Gemini Vision extrai direção de arte, respiro, contraste, tratamento fotográfico e hierarquia em JSON (com paleta cromática local quando a análise por IA estiver desativada).</p>
+        <div class="row">
+          <button type="button" id="sl-btn-image" class="btn btn-primary">Extrair DNA da Imagem</button>
+          <span id="sl-status-image" class="muted" role="status" aria-live="polite"></span>
+        </div>
+      </div>
+
+      <div class="lab-panel" id="panel-video" hidden>
+        <div class="field">
+          <label class="lbl" for="sl-video">Vídeo de referência MP4 (máx. 25 MB)</label>
+          <input class="ctl" id="sl-video" type="file" accept="video/mp4">
+        </div>
+        <p class="muted">FFmpeg detecta cortes de cena, calcula o ritmo médio (segundos por cena) e extrai keyframes para calibrar o motor de Teaser 60s.</p>
+        <div class="row">
+          <button type="button" id="sl-btn-video" class="btn btn-primary">Extrair DNA do Vídeo</button>
+          <span id="sl-status-video" class="muted" role="status" aria-live="polite"></span>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" id="lab-preview" hidden>
+      <h2>2. DNA Extraído — Revisar e Salvar</h2>
+      <div id="sl-warnings" class="notice" hidden></div>
+      <div id="sl-swatches" class="lab-swatches"></div>
+      <div id="sl-metrics" class="lab-metrics"></div>
+      <div id="sl-keyframes" class="lab-keyframes" hidden></div>
+      <div class="form-grid">
+        <div class="field full">
+          <label class="lbl" for="sl-preset-name">Nome do Preset no seletor "Modelo Visual"</label>
+          <input class="ctl" id="sl-preset-name" maxlength="60" placeholder="Ex.: Luxo Editorial Dark">
+        </div>
+      </div>
+      <div class="row">
+        <button type="button" id="sl-save" class="btn btn-primary">Salvar Preset no SQLite</button>
+        <a id="sl-go-kit" class="btn btn-secondary" href="/kit" hidden>Usar agora no Kit em Lote</a>
+        <span id="sl-save-status" class="muted" role="status" aria-live="polite"></span>
+      </div>
+      <details>
+        <summary>Ver JSON completo do DNA extraído</summary>
+        <pre id="sl-json" class="lab-json"></pre>
+      </details>
+    </section>
+
+    <section class="card" id="lab-saved">
+      <h2>3. Presets Salvos no Modelo Visual (SQLite)</h2>
+      <p class="muted">Todos os estilos abaixo aparecem automaticamente no seletor "Modelo Visual" da tela <a href="/kit">/kit</a>.</p>
+      <div id="sl-list" class="lab-preset-grid"></div>
+    </section>
+  </main>
+  <script type="module" src="/shell.mjs"></script>
+  <script type="module" src="/estilo.mjs"></script>
+</body>
+</html>
