@@ -4,6 +4,7 @@ import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import path from 'node:path';
 import { carregarAcervo } from './src/acervo-catalogo.mjs';
+import { extractSemanticBriefing, BRAND_KITS } from './src/website/brandKit.mjs';
 import { pathToFileURL } from 'node:url';
 import { readFile } from 'node:fs/promises';
 import { CampaignQueue } from './src/queues/campaignQueue.ts';
@@ -108,6 +109,17 @@ export function createServer({ lerAcervo = carregarAcervo, campaignQueue = null 
         const message = err instanceof Error ? err.message : 'Falha ao iniciar produção.';
         const status = /FAL_KEY|GEMINI_API_KEY/.test(message) ? 503 : 400;
         sendJson(res, status, { erro: message });
+      }
+      return;
+    }
+
+    if (req.method === 'POST' && pathname === '/api/website/extract') {
+      try {
+        const payload = await readJsonBody(req);
+        const ast = extractSemanticBriefing(payload);
+        sendJson(res, 200, { ok: true, ast, brand_kits: Object.keys(BRAND_KITS) });
+      } catch (err) {
+        sendJson(res, 400, { ok: false, erro: err instanceof Error ? err.message : 'Falha na extração semântica.' });
       }
       return;
     }
