@@ -103,9 +103,9 @@ $('k-gerar').addEventListener('click', async () => {
   if (!identidadeValidada) { st.textContent = 'Valide a identidade antes de gerar o lote.'; return; }
   if (!pieces.length) { st.textContent = 'Marque ao menos uma peça.'; return; }
   btn.disabled = true;
-  st.textContent = 'Gerando…';
+  st.textContent = $('k-zip-teaser').checked ? 'Gerando peças e teaser (cerca de 30 s)…' : 'Gerando…';
   try {
-    const r = await post('/api/kit/build', { ...identidadeValidada, pieces });
+    const r = await post('/api/kit/build', { ...identidadeValidada, pieces, ...($('k-zip-teaser').checked && { teaser: $('k-teaser-format').value }) });
     if (!r.ok) {
       const errJson = await lerJsonSeguro(r);
       st.textContent = errJson?.erro || `Falha ao gerar lote (HTTP ${r.status}).`;

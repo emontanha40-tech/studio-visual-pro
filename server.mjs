@@ -224,7 +224,7 @@ export function createServer({ lerAcervo = carregarAcervo, campaignQueue = null,
 
     if (req.method === 'POST' && pathname === '/api/kit/build') {
       try {
-        const { zip, manifest } = await buildKit(await readJsonBody(req));
+        const { zip, manifest } = await buildKit(await readJsonBody(req), { ...(kitDeps.rasterizer && { rasterizer: kitDeps.rasterizer }), ...(kitDeps.renderTeaser && { teaserRenderer: kitDeps.renderTeaser }), ...(kitDeps.photoResolver && { photoResolver: kitDeps.photoResolver }) });
         res.writeHead(200, {
           'Content-Type': 'application/zip',
           'Content-Disposition': 'attachment; filename="kit-studio-visual-pro.zip"',

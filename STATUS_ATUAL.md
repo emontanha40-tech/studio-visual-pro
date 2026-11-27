@@ -25,4 +25,8 @@
 
 ## Fatia 9C — Teaser 60s ✅ (2026-11-27)
 - Concluído: `src/kit/teaser.mjs` (6 cenas de 10s via Playwright + MP4 H.264 via FFmpeg, 9:16 e 16:9, mesmos Brand Tokens/fontes locais/logo), fila única (1 render por vez, 429 se cheia), erro estruturado `ffmpeg_unavailable`/`chromium_unavailable`, rotas `/api/kit/teasers` (+`/video`), botão na UI `/kit`. Render real: 60s, ~17s de processamento por formato. Testes: `tests/teaser.test.mjs`.
-- Falta: homologação visual no iPhone/Dell, impressos (9B), PNG via Playwright das peças.
+
+## Consolidação Final (9B + 9C + PNG Retina + Acervo Local) ✅ (2026-11-27)
+- Concluído: unificação 9B (Impressos) + 9C (Teaser 60s) na `main`; rasterização PNG Retina 2× via Playwright (`src/kit/raster.mjs`) para todas as peças digitais no ZIP (`/site/`, `/social/`, `/projecao/`, `/impressos/`, `/video/`, `/brand/`); acervo local curado em `assets/photos/` como fallback automático por nicho (`src/kit/photos.mjs`); checkbox para incluir Teaser 60s direto no ZIP em `/kit`.
+- Validação: `npm run check` + **108/108** testes passando (`tests/kitExport.test.mjs` incluído). Serviço `studio-visual-pro.service` reiniciado e validado em `http://100.82.176.70:4173/kit`.
+- Falta: teste real completo e homologação visual no iPhone via `http://100.82.176.70:4173/kit`.

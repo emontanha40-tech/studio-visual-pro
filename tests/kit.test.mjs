@@ -66,17 +66,17 @@ test('zip: assinatura e crc legíveis por unzip', async () => {
 test('lote: pastas, manifesto honesto e foto ausente', async () => {
   const { zip, manifest } = await buildKit({ ...input, preset: 'lancamento' }, { photoResolver: async () => null });
   const nomes = manifest.pecas.map((p) => p.arquivo);
-  assert.ok(nomes.includes('1-web/landing/index.html'));
-  assert.ok(nomes.some((n) => n.startsWith('2-redes-sociais/story-1080x1920')));
+  assert.ok(nomes.includes('site/landing/index.html'));
+  assert.ok(nomes.some((n) => n.startsWith('social/story-1080x1920')));
   assert.match(manifest.foto.fonte, /nenhuma/);
-  assert.ok(manifest.observacoes.some((o) => o.includes('pendentes')));
+  assert.ok(manifest.observacoes.some((o) => o.includes('pendente')));
   assert.ok(zip.includes(Buffer.from('manifesto.json')));
 });
 
 test('lote com foto inclui o arquivo e crédito', async () => {
   const photo = { bytes: Buffer.from([1, 2, 3]), mime: 'image/jpeg', source: 'acervo-local', credit: 'x.jpg' };
   const { zip, manifest } = await buildKit({ ...input, pieces: ['landing', 'feed'] }, { photoResolver: async () => photo });
-  assert.ok(zip.includes(Buffer.from('1-web/landing/foto-base.jpg')));
+  assert.ok(zip.includes(Buffer.from('site/landing/foto-base.jpg')));
   assert.equal(manifest.foto.fonte, 'acervo-local');
 });
 

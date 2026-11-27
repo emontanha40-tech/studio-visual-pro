@@ -1,28 +1,46 @@
 import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
+import { fileURLToPath } from 'node:url';
+
+const ACERVO_DIR = fileURLToPath(new URL('../../assets/photos', import.meta.url));
+// nicho livre → pasta do acervo curado (primeira regra que casar). 'geral' é o fallback final.
+const NICHOS = [
+  ['odontologia', /odont|dentist|sorriso|ortodon/],
+  ['saude', /clinic|medic|saude|psicolog|fisioter|nutri|consultorio|terapia|hospital/],
+  ['igreja', /igreja|serie|culto|ministerio|pastor|congresso|evangeli|batism|jovens|crist|louvor|missao/],
+  ['tecnologia', /tech|saas|software|plataforma|aplicativo|\bapp\b|automac|sistema|dashboard|tecnolog/],
+  ['moda', /varejo|loja|comercio|boutique|moda|roupa|vestuario|joia/],
+  ['geral', /negocio|empresa|consultoria|servico|corporativ/],
+];
 
 const MAX_BYTES = 3 * 1024 * 1024;
 const slugify = (s) => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
 /**
- * Foto-base por nicho. Ordem: acervo local curado (assets/fotos/<nicho>/*.jpg|png) →
+ * Foto-base por nicho. Ordem: acervo local curado (assets/photos/<nicho>/hero.jpg, com sinônimos e fallback 'geral') →
  * Pexels (somente se PEXELS_API_KEY existir; 1 tentativa, timeout 5 s, limite 3 MB) → null (fundo gráfico).
  * Nunca gera rostos ou pessoas por IA. Retorna {bytes, mime, source, credit} ou null.
  */
-export async function resolvePhoto({ nicho, env = process.env, fetchImpl = globalThis.fetch, baseDir = 'assets/fotos' } = {}) {
-  const slug = slugify(nicho);
-  if (slug) {
+async function fromAcervo(baseDir, folders, seed) {
+  for (const folder of folders) {
     try {
-      const dir = path.resolve(baseDir, slug);
+      const dir = path.resolve(baseDir, folder);
       const files = (await readdir(dir)).filter((f) => /\.(jpe?g|png)$/i.test(f)).sort();
-      if (files.length) {
-        const pick = files[createHash('sha256').update(slug).digest()[0] % files.length];
-        const bytes = await readFile(path.join(dir, pick));
-        return { bytes, mime: /png$/i.test(pick) ? 'image/png' : 'image/jpeg', source: 'acervo-local', credit: pick };
-      }
-    } catch { /* sem acervo para este nicho */ }
+      if (!files.length) continue;
+      const pick = files.find((f) => /^hero\./i.test(f)) ?? files[createHash('sha256').update(seed).digest()[0] % files.length];
+      const bytes = await readFile(path.join(dir, pick));
+      return { bytes, mime: /png$/i.test(pick) ? 'image/png' : 'image/jpeg', source: 'acervo-local', credit: `${folder}/${pick}` };
+    } catch { /* pasta ausente: tenta a próxima */ }
   }
+  return null;
+}
+
+export async function resolvePhoto({ nicho, env = process.env, fetchImpl = globalThis.fetch, baseDir = ACERVO_DIR } = {}) {
+  const slug = slugify(nicho);
+  const folders = [slug, ...NICHOS.filter(([, re]) => re.test(slug.replace(/-/g, ' '))).map(([f]) => f), 'geral'].filter(Boolean);
+  const local = await fromAcervo(baseDir, [...new Set(folders)], slug || 'geral');
+  if (local) return local;
   const key = env.PEXELS_API_KEY;
   if (key && slug && fetchImpl) {
     try {
