@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Studio Visual Pro · Criador de Sites</title>
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    .ws-grid{display:grid;grid-template-columns:380px 1fr;gap:20px;align-items:start}
+    .ws-panel{display:flex;flex-direction:column;gap:14px}
+    .ws-tpls{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+    .ws-tpl{padding:10px 8px;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.03);color:inherit;cursor:pointer;text-align:left}
+    .ws-tpl.on{border-color:#10f5a0;background:rgba(16,245,160,.12)}
+    .ws-tpl b{display:block;font-size:12px;margin-bottom:6px}
+    .ws-sw{display:flex;gap:4px}.ws-sw i{width:11px;height:11px;border-radius:50%;display:block}
+    .ws-chips{display:flex;flex-wrap:wrap;gap:6px}
+    .ws-chip{padding:6px 10px;border-radius:999px;font-size:12px;border:1px solid rgba(255,255,255,.16);background:transparent;color:inherit;cursor:pointer}
+    .ws-chip.on{border-color:#00e5ff;background:rgba(0,229,255,.14)}
+    .ws-preview-bar{display:flex;gap:8px;align-items:center;margin-bottom:10px}
+    .ws-frame{width:100%;height:74vh;border:1px solid rgba(255,255,255,.14);border-radius:14px;background:#03050c;transition:width .25s}
+    .ws-frame.mobile{width:390px;max-width:100%;display:block;margin:0 auto}
+    @media(max-width:960px){.ws-grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <aside>
+    <a class="brand" href="/">SV<span>P</span><small>STUDIO VISUAL PRO</small></a>
+    <p class="aside-label">SEU ESTÚDIO, ORGANIZADO</p>
+    <nav>
+      <a href="/#brief">01 &nbsp; Briefing</a>
+      <a href="/#directions">02 &nbsp; Direção criativa</a>
+      <a href="/#approval">03 &nbsp; Aprovações</a>
+      <a href="/#delivery">04 &nbsp; Produção</a>
+      <a href="/#acervo">05 &nbsp; Acervo</a>
+      <a href="/website" style="font-weight:700;opacity:1">06 &nbsp; Criador de Sites</a>
+    </nav>
+    <p class="aside-footer">Studio Visual Pro · Motor Web<br>Integrado ao Assessor Studio</p>
+  </aside>
+
+  <main>
+    <header>
+      <p class="eyebrow">06 · CRIADOR DE SITES</p>
+      <h1>Gere sites cinematográficos a partir do seu briefing</h1>
+      <p class="lead">Escolha o modelo visual, personalize os blocos e veja o preview ao vivo em Desktop e iPhone.</p>
+    </header>
+
+    <section class="card ws-grid">
+      <div class="ws-panel">
+        <div>
+          <label>Modelo Visual</label>
+          <div class="ws-tpls" id="ws-tpls">
+            <button type="button" class="ws-tpl on" data-t="tech-cinematografico"><b>Tech Cinema</b><div class="ws-sw"><i style="background:#03050c"></i><i style="background:#2f7bff"></i><i style="background:#00e5ff"></i></div></button>
+            <button type="button" class="ws-tpl" data-t="editorial-clean"><b>Editorial Luxo</b><div class="ws-sw"><i style="background:#0b0c10"></i><i style="background:#d4a359"></i><i style="background:#f3d59b"></i></div></button>
+            <button type="button" class="ws-tpl" data-t="comercial-conversao"><b>Alta Conversão</b><div class="ws-sw"><i style="background:#070b14"></i><i style="background:#6366f1"></i><i style="background:#10f5a0"></i></div></button>
+          </div>
+        </div>
+        <div><label for="ws-slug">Slug do Projeto</label><input id="ws-slug" value="connect-oficial"></div>
+        <div><label for="ws-marca">Marca</label><input id="ws-marca" value="Connect"></div>
+        <div><label for="ws-submarca">Subtítulo da Marca</label><input id="ws-submarca" value="Soluções Tecnológicas"></div>
+        <div><label for="ws-slogan">Slogan Principal</label><input id="ws-slogan" value="Conectando você ao que há de melhor."></div>
+        <div><label for="ws-sub">Descrição / Oferta</label><textarea id="ws-sub" rows="3">Automações, aplicativos, websites, CRM e MCP personalizado — criados sob medida para a sua necessidade real.</textarea></div>
+        <div>
+          <label for="ws-ritmo">Ritmo das Transições</label>
+          <select id="ws-ritmo">
+            <option value="equilibrado" selected>Equilibrado (Recomendado)</option>
+            <option value="suave">Suave / Cinematográfico</option>
+            <option value="dinamico">Dinâmico / Ágil</option>
+          </select>
+        </div>
+        <div>
+          <label>Módulos Ativos</label>
+          <div class="ws-chips" id="ws-mods">
+            <button type="button" class="ws-chip on" data-m="hero">Hero</button>
+            <button type="button" class="ws-chip on" data-m="devices">Dispositivos</button>
+            <button type="button" class="ws-chip on" data-m="telao_cards">Telão Produtos</button>
+            <button type="button" class="ws-chip on" data-m="workflow">Fluxo Visual</button>
+            <button type="button" class="ws-chip on" data-m="founder">Fundador 3D</button>
+            <button type="button" class="ws-chip on" data-m="cta">CTA WhatsApp</button>
+          </div>
+        </div>
+        <button type="button" id="ws-build">🚀 Gerar Site pelo Motor SVP</button>
+        <p id="ws-status" role="status" aria-live="polite">Pronto para gerar.</p>
+      </div>
+
+      <div>
+        <div class="ws-preview-bar">
+          <button type="button" id="ws-desk">🖥️ Desktop</button>
+          <button type="button" id="ws-mob" class="quiet">📱 iPhone</button>
+          <a id="ws-open" href="/api/website/preview/connect-oficial/index.html" target="_blank" style="margin-left:auto">Abrir em nova aba ↗</a>
+        </div>
+        <iframe id="ws-frame" class="ws-frame" src="/api/website/preview/connect-oficial/index.html"></iframe>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="/website.mjs"></script>
+</body>
+</html>

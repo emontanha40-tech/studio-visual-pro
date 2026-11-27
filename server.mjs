@@ -1,10 +1,15 @@
 import http from 'node:http';
 import { existsSync } from 'node:fs';
+import { execFile } from 'node:child_process';
+import { promisify } from 'node:util';
+import path from 'node:path';
 import { carregarAcervo } from './src/acervo-catalogo.mjs';
 import { pathToFileURL } from 'node:url';
 import { readFile } from 'node:fs/promises';
 import { CampaignQueue } from './src/queues/campaignQueue.ts';
 import { createMediaProvider } from './src/services/ai-media/index.ts';
+
+const execFileAsync = promisify(execFile);
 
 // Carrega .env automaticamente (Node 22+) para que FAL_KEY / ANTHROPIC_API_KEY nunca fiquem vazias
 const envPath = new URL('.env', import.meta.url);
@@ -26,8 +31,10 @@ const MAX_BODY_BYTES = 64 * 1024;
 
 const routes = new Map([
   ['/', ['public/index.html', 'text/html']],
+  ['/website', ['public/website.html', 'text/html']],
   ['/showcase', ['public/showcase.html', 'text/html']],
   ['/app.mjs', ['public/app.mjs', 'text/javascript']],
+  ['/website.mjs', ['public/website.mjs', 'text/javascript']],
   ['/showcase.mjs', ['public/showcase.mjs', 'text/javascript']],
   ['/style.css', ['public/style.css', 'text/css']],
   ['/engine.mjs', ['src/engine.mjs', 'text/javascript']],
@@ -105,6 +112,47 @@ export function createServer({ lerAcervo = carregarAcervo, campaignQueue = null 
       return;
     }
 
+    if (req.method === 'POST' && pathname === '/api/website/build') {
+      try {
+        const payload = await readJsonBody(req);
+        const safeSlug = String(payload.slug || 'connect-oficial').replace(/[^a-zA-Z0-9_-]/g, '') || 'connect-oficial';
+        const outDir = `/home/ubuntu/workspaces/Projetos/site-${safeSlug}`;
+        const pyCode = [
+          'import json, sys',
+          'sys.path.insert(0, "/home/ubuntu/workspaces/Projetos/Assessor-Studio")',
+          'from site_builder.engine import SiteBriefing, build_site',
+          'data = json.loads(sys.argv[1])',
+          'res = build_site(SiteBriefing.from_dict(data), sys.argv[2])',
+          'print(json.dumps(res, ensure_ascii=False))',
+        ].join('; ');
+        const { stdout } = await execFileAsync('python3', ['-c', pyCode, JSON.stringify(payload), outDir]);
+        sendJson(res, 200, JSON.parse(stdout.trim()));
+      } catch (err) {
+        sendJson(res, 400, { ok: false, erro: err instanceof Error ? err.message : 'Falha ao gerar site.' });
+      }
+      return;
+    }
+
+    if (req.method === 'GET' && pathname.startsWith('/api/website/preview/')) {
+      const rest = pathname.slice('/api/website/preview/'.length);
+      const [rawSlug, ...parts] = rest.split('/');
+      const safeSlug = (rawSlug || 'connect-oficial').replace(/[^a-zA-Z0-9_-]/g, '') || 'connect-oficial';
+      const relFile = parts.join('/') || 'index.html';
+      const baseDir = path.resolve(`/home/ubuntu/workspaces/Projetos/site-${safeSlug}`);
+      const target = path.resolve(baseDir, relFile);
+      if (!target.startsWith(baseDir) || !existsSync(target)) {
+        res.writeHead(404);
+        res.end('Não encontrado');
+        return;
+      }
+      const ext = path.extname(target).toLowerCase();
+      const mime = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.jpg': 'image/jpeg', '.png': 'image/png' }[ext] || 'application/octet-stream';
+      const data = await readFile(target);
+      res.writeHead(200, { 'Content-Type': mime, 'Cache-Control': 'no-store' });
+      res.end(data);
+      return;
+    }
+
     if (req.method !== 'GET') {
       res.writeHead(405);
       res.end('Somente leitura');
@@ -147,7 +195,7 @@ export function createServer({ lerAcervo = carregarAcervo, campaignQueue = null 
         'X-Content-Type-Options': 'nosniff',
         'Referrer-Policy': 'no-referrer',
         'Content-Security-Policy':
-          "default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' blob: https:; media-src 'self' https:; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
+          "default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' blob: https:; media-src 'self' https:; frame-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
       });
       res.end(body);
     } catch {
