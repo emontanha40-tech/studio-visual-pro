@@ -38,7 +38,9 @@ function montarPecas() {
     for (const p of catalogo.pecas.filter((x) => x.category === cat.id)) {
       const l = document.createElement('label'); l.style.display = 'block';
       const c = document.createElement('input'); c.type = 'checkbox'; c.value = p.id; c.style.width = 'auto'; c.style.marginRight = '8px';
-      l.append(c, `${p.name}${p.height ? ` (${p.width}×${p.height})` : ''}`); root.append(l);
+      const size = p.height ? ` (${p.width}×${p.height} ${p.unit || 'px'})` : '';
+      const proof = p.print?.provisional ? ' · prova 1:10, gabarito a confirmar' : '';
+      l.append(c, p.name + size + proof); root.append(l);
     }
   }
   const pr = $('k-presets'); pr.textContent = '';

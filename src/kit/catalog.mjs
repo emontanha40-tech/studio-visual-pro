@@ -1,10 +1,18 @@
-// Catálogo unificado de peças digitais, de projeção e web (Fatia 9A).
-// Impressos (convite, régua, backdrop...) entram na Fatia 9B. Dimensões em px (96 dpi lógico).
+// Catálogo unificado. Dimensões digitais em px e dimensões de corte dos impressos em mm.
 // safe = fração de margem segura por lado {t,r,b,l}. Story: topo/base livres da UI do app.
+function printPiece(id, name, width, height, { sides = ['frente'], scale = 1 } = {}) {
+  const large = scale !== 1;
+  return {
+    id, name, width, height, category: 'impressos', format: 'print', unit: 'mm',
+    print: { sides, scale, dpi: large ? 150 : 300, bleedMm: large ? 10 : 3, provisional: large },
+  };
+}
+
 export const CATEGORIES = [
   { id: 'web', name: 'Web' },
   { id: 'social', name: 'Redes Sociais' },
   { id: 'projecao', name: 'Projeção / Telão' },
+  { id: 'impressos', name: 'Impressos e gráfica' },
 ];
 
 export const KIT_PIECES = [
@@ -16,6 +24,12 @@ export const KIT_PIECES = [
   { id: 'screen', category: 'projecao', name: 'Telão 16:9 (overscan 10%)', width: 1920, height: 1080, format: 'svg', safe: { t: 0.1, r: 0.1, b: 0.1, l: 0.1 }, note: 'Conteúdo dentro de 10% de overscan.' },
   { id: 'slide-capa', category: 'projecao', name: 'Slide de Série — capa com título', width: 1920, height: 1080, format: 'svg', safe: { t: 0.1, r: 0.1, b: 0.1, l: 0.1 } },
   { id: 'slide-fundo', category: 'projecao', name: 'Slide de Série — fundo limpo (letras)', width: 1920, height: 1080, format: 'svg', safe: { t: 0.1, r: 0.1, b: 0.1, l: 0.1 }, note: 'Sem texto: para letras e projeção.' },
+  printPiece('invitation', 'Convite frente e verso', 100, 150, { sides: ['frente', 'verso'] }),
+  printPiece('prayer', 'Bloco de Oração', 148, 210),
+  printPiece('decision', 'Cartão de Decisão', 148, 105),
+  printPiece('bookmark', 'Régua de Livro frente e verso', 50, 180, { sides: ['frente', 'verso'] }),
+  printPiece('backdrop', 'Backdrop', 3200, 1800, { scale: 10 }),
+  printPiece('wind', 'Wind Banner', 700, 2000, { scale: 10 }),
 ];
 
 export const PRESETS = [
