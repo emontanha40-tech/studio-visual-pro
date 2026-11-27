@@ -8,6 +8,10 @@ import { extractSemanticBriefing, BRAND_KITS } from './src/website/brandKit.mjs'
 import { KIT_PIECES, PRESETS, CATEGORIES } from './src/kit/catalog.mjs';
 import { buildIdentity } from './src/kit/identity.mjs';
 import { buildKit } from './src/kit/batch.mjs';
+import { createTeaserQueue } from './src/kit/teaser.mjs';
+import { generateKit } from './src/brand/kitService.mjs';
+import { openProjectStore, isKitId } from './src/brand/projectStore.mjs';
+import { generateCampaignPiece, publishedFile, PUBLISHED_DIR } from './src/brand/campaignService.mjs';
 import { pathToFileURL } from 'node:url';
 import { readFile } from 'node:fs/promises';
 import { CampaignQueue } from './src/queues/campaignQueue.ts';
@@ -93,14 +97,26 @@ function getDefaultQueue() {
 }
 
 /**
- * @param {{ lerAcervo?: typeof carregarAcervo, campaignQueue?: CampaignQueue | null, extraAllowedHosts?: string[] }} [options]
+ * @param {{ lerAcervo?: typeof carregarAcervo, campaignQueue?: CampaignQueue | null, extraAllowedHosts?: string[], projectStore?: ReturnType<typeof openProjectStore> | null, kitDeps?: Record<string, any> }} [options]
  */
-export function createServer({ lerAcervo = carregarAcervo, campaignQueue = null, extraAllowedHosts = rawExtraHosts } = {}) {
+export function createServer({ lerAcervo = carregarAcervo, campaignQueue = null, extraAllowedHosts = rawExtraHosts, projectStore = null, kitDeps = {} } = {}) {
+  const teaserQueue = createTeaserQueue(kitDeps.renderTeaser);
   let activeQueue = campaignQueue ?? null;
+  let activeStore = projectStore ?? null;
+  const getStore = () => activeStore ?? (activeStore = openProjectStore());
+  const publishDir = kitDeps.publishDir ?? PUBLISHED_DIR;
   const normalizedExtraHosts = normalizeAllowedHosts(extraAllowedHosts, port);
 
-  return http.createServer(async (req, res) => {
-    const allowedHosts = [`127.0.0.1:${port}`, `localhost:${port}`, ...normalizedExtraHosts];
+  const server = http.createServer(async (req, res) => {
+    const addr = server.address();
+    const activePort = typeof addr === 'object' && addr ? addr.port : port;
+    const allowedHosts = [
+      `127.0.0.1:${port}`,
+      `localhost:${port}`,
+      `127.0.0.1:${activePort}`,
+      `localhost:${activePort}`,
+      ...normalizedExtraHosts,
+    ];
     if (!allowedHosts.includes(req.headers.host)) {
       res.writeHead(403);
       res.end('Host recusado');
@@ -122,6 +138,77 @@ export function createServer({ lerAcervo = carregarAcervo, campaignQueue = null,
         const message = err instanceof Error ? err.message : 'Falha ao iniciar produção.';
         const status = /FAL_KEY|GEMINI_API_KEY/.test(message) ? 503 : 400;
         sendJson(res, status, { erro: message });
+      }
+      return;
+    }
+
+    if (req.method === 'POST' && pathname === '/api/brand/generate') {
+      try {
+        const piece = await generateCampaignPiece(await readJsonBody(req));
+        sendJson(res, 201, piece);
+      } catch (err) {
+        sendJson(res, 400, { erro: err instanceof Error ? err.message : 'Falha ao gerar peça.' });
+      }
+      return;
+    }
+
+    if (req.method === 'POST' && pathname === '/api/brand/kit') {
+      try {
+        const result = await generateKit(await readJsonBody(req), { store: getStore(), ...kitDeps });
+        sendJson(res, 201, result);
+      } catch (err) {
+        sendJson(res, 400, { erro: err instanceof Error ? err.message : 'Falha ao gerar kit.' });
+      }
+      return;
+    }
+
+    if (req.method === 'POST' && pathname === '/api/kit/teasers') {
+      try {
+        const { status, body } = teaserQueue.submit(await readJsonBody(req));
+        sendJson(res, status, body);
+      } catch {
+        sendJson(res, 400, { code: 'invalid_briefing', erro: 'Não foi possível ler o briefing.' });
+      }
+      return;
+    }
+
+    const teaserMatch = /^\/api\/kit\/teasers\/([a-f0-9-]{36})(\/video)?$/.exec(pathname);
+    if (req.method === 'GET' && teaserMatch) {
+      const [, id, isVideo] = teaserMatch;
+      const job = teaserQueue.get(id);
+      if (!job) {
+        sendJson(res, 404, { code: 'teaser_not_found', erro: 'Teaser indisponível. Gere novamente.' });
+      } else if (!isVideo) {
+        const { status, format, code, erro } = job;
+        sendJson(res, 200, { id, status, format, code, erro,
+          videoUrl: status === 'ready' ? `/api/kit/teasers/${id}/video` : undefined });
+      } else if (job.status !== 'ready') {
+        sendJson(res, 409, { code: 'teaser_not_ready', erro: job.erro || 'O vídeo ainda está sendo gerado.' });
+      } else {
+        const video = job.video;
+        const headers = {
+          'Content-Type': 'video/mp4',
+          'Cache-Control': 'no-store',
+          'X-Content-Type-Options': 'nosniff',
+          'Accept-Ranges': 'bytes',
+        };
+        if (urlObj.searchParams.has('download')) {
+          headers['Content-Disposition'] = `attachment; filename="teaser-${job.format.replace(':', 'x')}.mp4"`;
+        }
+        const range = req.headers.range;
+        if (range) {
+          const match = /^bytes=(\d*)-(\d*)$/.exec(range);
+          const start = match?.[1] ? Number(match[1]) : Math.max(0, video.length - Number(match?.[2]));
+          const end = match?.[1] && match[2] ? Math.min(Number(match[2]), video.length - 1) : video.length - 1;
+          if (!match || start > end) {
+            res.writeHead(416, { 'Content-Range': `bytes */${video.length}` }).end();
+            return;
+          }
+          res.writeHead(206, { ...headers, 'Content-Length': end - start + 1,
+            'Content-Range': `bytes ${start}-${end}/${video.length}` }).end(video.subarray(start, end + 1));
+        } else {
+          res.writeHead(200, { ...headers, 'Content-Length': video.length }).end(video);
+        }
       }
       return;
     }
@@ -221,6 +308,78 @@ export function createServer({ lerAcervo = carregarAcervo, campaignQueue = null,
       return;
     }
 
+    if (pathname === '/api/kits') {
+      const page = Math.max(0, Number(urlObj.searchParams.get('page') || 0) || 0);
+      const limit = 20;
+      const rows = getStore().listKits(limit + 1, page * limit);
+      const hasMore = rows.length > limit;
+      const kits = rows.slice(0, limit).map((k) => ({
+        ...k,
+        downloadUrl: `/api/kits/${k.id}/zip`,
+        liveAvailable: existsSync(path.join(publishDir, k.slug, 'index.html')),
+      }));
+      sendJson(res, 200, { kits, hasMore });
+      return;
+    }
+
+    if (pathname.startsWith('/api/kits/')) {
+      const rest = pathname.slice('/api/kits/'.length);
+      const zipMatch = /^([^/]+)\/zip$/.exec(rest);
+      if (zipMatch) {
+        const id = zipMatch[1];
+        const found = isKitId(id) ? getStore().getZip(id) : null;
+        if (!found) {
+          res.writeHead(404);
+          res.end('Não encontrado');
+          return;
+        }
+        res.writeHead(200, {
+          'Content-Type': 'application/zip',
+          'Content-Disposition': `attachment; filename="kit-${found.slug}.zip"`,
+          'Cache-Control': 'no-store',
+          'X-Content-Type-Options': 'nosniff',
+        });
+        res.end(found.data);
+        return;
+      }
+      const socialMatch = /^([^/]+)\/social\/([\w.-]+\.png)$/.exec(rest);
+      if (socialMatch) {
+        const [, id, file] = socialMatch;
+        const buf = isKitId(id) ? getStore().getFile(id, file) : null;
+        if (!buf) {
+          res.writeHead(404);
+          res.end('Não encontrado');
+          return;
+        }
+        res.writeHead(200, {
+          'Content-Type': 'image/png',
+          'Cache-Control': 'no-store',
+          'X-Content-Type-Options': 'nosniff',
+        });
+        res.end(buf);
+        return;
+      }
+      res.writeHead(404);
+      res.end('Não encontrado');
+      return;
+    }
+
+    if (pathname.startsWith('/published/')) {
+      const file = publishedFile(pathname.slice('/published/'.length), { baseDir: publishDir });
+      if (!file) {
+        res.writeHead(404);
+        res.end('Não encontrado');
+        return;
+      }
+      res.writeHead(200, {
+        'Content-Type': file.type,
+        'Cache-Control': 'no-store',
+        'X-Content-Type-Options': 'nosniff',
+      });
+      res.end(file.data);
+      return;
+    }
+
     if (pathname === '/api/kit/catalog') {
       sendJson(res, 200, { categorias: CATEGORIES, pecas: KIT_PIECES, presets: PRESETS });
       return;
@@ -259,6 +418,7 @@ export function createServer({ lerAcervo = carregarAcervo, campaignQueue = null,
       res.end('Falha ao abrir arquivo');
     }
   });
+  return server;
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {

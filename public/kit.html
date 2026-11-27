@@ -41,6 +41,18 @@
       <p><button type="button" id="k-gerar">Gerar lote e baixar ZIP</button></p>
       <p id="k-status" aria-live="polite"></p>
       <p class="muted">Peças em SVG; PNG via Playwright e homologação visual humana ainda pendentes.</p>
+      <h3>Teaser de 60 segundos</h3>
+      <label for="k-teaser-format">Formato do vídeo</label>
+      <select id="k-teaser-format">
+        <option value="9:16">Vertical 9:16</option>
+        <option value="16:9">Telão 16:9</option>
+      </select>
+      <p><button type="button" id="k-teaser">Gerar teaser</button></p>
+      <p id="k-teaser-status" role="status"></p>
+      <div id="k-teaser-result" hidden>
+        <video id="k-teaser-video" controls playsinline preload="metadata" style="max-width:100%;max-height:480px"></video>
+        <p><a id="k-teaser-download" download>Baixar MP4</a></p>
+      </div>
     </section>
   </main>
   <script type="module" src="/kit.mjs"></script>

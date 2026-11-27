@@ -16,3 +16,7 @@
 - Concluído: `src/kit/` (catálogo de 8 peças: landing, feed, story, whatsapp, banner, telão c/ overscan 10%, slide-capa, slide-fundo; presets Culto/Série e Lançamento; identidade WCAG; foto por nicho via acervo local `assets/fotos/<nicho>/` ou Pexels com `PEXELS_API_KEY`; ZIP por pastas + manifesto). UI em `/kit`, API `/api/kit/{catalog,identity,build}`. Testes: `tests/kit.test.mjs`.
 - Commit local das Fatias 4–9A salvo na branch `main` e acesso via Tailscale (`http://100.82.176.70:4173/kit` e `http://connect-projetos.tail9dcf54.ts.net:4173/kit`) liberado para iPhone e Dell (`ALLOWED_HOSTS` aceitando host com porta).
 - Falta: rasterização PNG via Playwright (peças hoje são SVG), acervo de fotos curado em `assets/fotos/`, upload de foto do cliente, homologação visual no iPhone/Dell, impressos (9B) e Teaser 60s (9C).
+
+## Fatia 9C — Teaser 60s ✅ (2026-11-27)
+- Concluído: `src/kit/teaser.mjs` (6 cenas de 10s via Playwright + MP4 H.264 via FFmpeg, 9:16 e 16:9, mesmos Brand Tokens/fontes locais/logo), fila única (1 render por vez, 429 se cheia), erro estruturado `ffmpeg_unavailable`/`chromium_unavailable`, rotas `/api/kit/teasers` (+`/video`), botão na UI `/kit`. Render real: 60s, ~17s de processamento por formato. Testes: `tests/teaser.test.mjs`.
+- Falta: homologação visual no iPhone/Dell, impressos (9B), PNG via Playwright das peças.

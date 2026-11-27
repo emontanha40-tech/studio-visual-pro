@@ -20,6 +20,9 @@ function invalidarIdentidade() {
   $('etapa2').hidden = true;
   $('k-identidade').textContent = 'Campos alterados. Clique em "Validar identidade" novamente antes de gerar o lote.';
   $('k-status').textContent = '';
+  $('k-teaser-result').hidden = true;
+  $('k-teaser-video').pause();
+  $('k-teaser-status').textContent = '';
 }
 document.querySelectorAll('#etapa1 input, #etapa1 select').forEach((el) => {
   el.addEventListener('input', invalidarIdentidade);
@@ -70,6 +73,10 @@ $('k-validar').addEventListener('click', async () => {
       }
       catalogo = catJson;
     }
+    if (JSON.stringify(dados()) !== JSON.stringify(snapshot)) {
+      out.textContent = 'Campos alterados. Valide a identidade novamente.';
+      return;
+    }
     const id = j.identidade; out.textContent = '';
     const sw = document.createElement('div');
     for (const [k, v] of Object.entries(id.kit.colors)) { const i = document.createElement('i'); i.title = `${k} ${v}`; i.style.cssText = `display:inline-block;width:28px;height:28px;border-radius:50%;margin:2px;background:${v}`; sw.append(i); }
@@ -110,5 +117,47 @@ $('k-gerar').addEventListener('click', async () => {
     st.textContent = 'Erro de rede ao gerar o lote. Tente novamente.';
   } finally {
     btn.disabled = false;
+  }
+});
+
+
+$('k-teaser').addEventListener('click', async () => {
+  const snapshot = identidadeValidada;
+  if (!snapshot) return;
+  const button = $('k-teaser');
+  const status = $('k-teaser-status');
+  const result = $('k-teaser-result');
+  const video = $('k-teaser-video');
+  button.disabled = true;
+  result.hidden = true;
+  video.removeAttribute('src');
+  video.load();
+  status.textContent = 'Enviando teaser para a fila…';
+  try {
+    const response = await post('/api/kit/teasers', { ...snapshot, formato: $('k-teaser-format').value });
+    const submitted = await lerJsonSeguro(response);
+    if (!response.ok || !submitted?.id) throw new Error(submitted?.erro || 'Falha ao solicitar o teaser.');
+    const jobUrl = '/api/kit/teasers/' + encodeURIComponent(submitted.id);
+    for (let attempt = 0; attempt < 180; attempt++) {
+      if (snapshot !== identidadeValidada) return;
+      const res = await fetch(jobUrl);
+      const job = await lerJsonSeguro(res);
+      if (snapshot !== identidadeValidada) return;
+      if (!res.ok || !job || job.status === 'failed') throw new Error(job?.erro || 'Falha ao consultar o teaser.');
+      if (job.status === 'ready') {
+        video.src = job.videoUrl;
+        $('k-teaser-download').href = job.videoUrl + '?download=1';
+        status.textContent = 'Teaser pronto.';
+        result.hidden = false;
+        return;
+      }
+      status.textContent = job.status === 'queued' ? 'Aguardando na fila…' : 'Renderizando o vídeo…';
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+    }
+    throw new Error('O teaser excedeu o tempo de espera.');
+  } catch (error) {
+    if (snapshot === identidadeValidada) status.textContent = error.message;
+  } finally {
+    button.disabled = false;
   }
 });
