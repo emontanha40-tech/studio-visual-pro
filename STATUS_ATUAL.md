@@ -30,3 +30,8 @@
 - Concluído: unificação 9B (Impressos) + 9C (Teaser 60s) na `main`; rasterização PNG Retina 2× via Playwright (`src/kit/raster.mjs`) para todas as peças digitais no ZIP (`/site/`, `/social/`, `/projecao/`, `/impressos/`, `/video/`, `/brand/`); acervo local curado em `assets/photos/` como fallback automático por nicho (`src/kit/photos.mjs`); checkbox para incluir Teaser 60s direto no ZIP em `/kit`.
 - Validação: `npm run check` + **108/108** testes passando (`tests/kitExport.test.mjs` incluído). Serviço `studio-visual-pro.service` reiniciado e validado em `http://100.82.176.70:4173/kit`.
 - Falta: teste real completo e homologação visual no iPhone via `http://100.82.176.70:4173/kit`.
+
+## Fatia 10 — Shell Unificado + Redesign Pro da Tela `/kit` ✅ (2026-11-27)
+- Concluído: sidebar única (`public/shell.mjs`) aplicada em `/`, `/kit`, `/website` e `/showcase` com os 7 itens (`01 Briefing` a `07 Kit em Lote`), destaque de rota ativa e menu recolhível no mobile; remoção do aviso legado da tela principal; redesign da tela `/kit` com grid responsivo de 2 colunas, labels superiores em caixa alta, inputs `44px`, card **Briefing Inteligente (1 Clique)** conectado a `POST /api/kit/ai-fill`, hierarquia de botões com SVG e peças selecionáveis em grid de cards (3/2/1 colunas).
+- Validação: `npm run check` + **109/109** testes passando (`tests/kit.test.mjs`), serviço `studio-visual-pro.service` reiniciado e smoke test HTTP 200 nas rotas `/`, `/kit`, `/website`, `/showcase` e `/shell.mjs`.
+- Falta: homologação visual no iPhone (`http://100.82.176.70:4173/kit`) e teste real do fluxo completo de geração de lote.

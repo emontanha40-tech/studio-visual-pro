@@ -111,3 +111,21 @@ test('API: catálogo, identidade e ZIP; peça inválida retorna 400', async (t) 
   assert.equal((await req(server, '/api/kit/build', 'POST', { pieces: ['x'] })).status, 400);
   assert.equal((await req(server, '/kit')).status, 200);
 });
+
+test('Fatia 10: shell único em todas as rotas e preenchimento de identidade', async (t) => {
+  const server = createServer(); await new Promise((r) => server.listen(0, '127.0.0.1', r)); t.after(() => new Promise((r) => server.close(r)));
+  assert.equal((await req(server, '/shell.mjs')).status, 200);
+  const shell = (await req(server, '/shell.mjs')).body.toString();
+  for (const nome of ['Briefing', 'Direção criativa', 'Aprovações', 'Produção', 'Acervo', 'Criador de Sites', 'Kit em Lote']) assert.ok(shell.includes(nome), nome);
+  for (const rota of ['/', '/kit', '/website', '/showcase']) {
+    const html = (await req(server, rota)).body.toString();
+    assert.match(html, /\/shell\.mjs/, rota);
+    assert.doesNotMatch(html, /<aside/, rota);
+  }
+  assert.doesNotMatch((await req(server, '/')).body.toString(), /não gera artes finais/);
+  const ok = JSON.parse((await req(server, '/api/kit/ai-fill', 'POST', { briefing: 'Plataforma SaaS de automação para equipes de vendas' })).body);
+  assert.equal(ok.ok, true);
+  assert.equal(ok.campos.modelo, 'tech-cinematografico');
+  assert.ok(ok.campos.marca && ok.campos.slogan);
+  assert.equal((await req(server, '/api/kit/ai-fill', 'POST', { briefing: 'x' })).status, 400);
+});

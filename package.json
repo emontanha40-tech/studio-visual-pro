@@ -11,7 +11,7 @@
     "start": "node server.mjs",
     "test": "node --test tests/*.test.mjs tests/*.test.ts",
     "typecheck": "tsc --noEmit",
-    "check": "node --check server.mjs && node --check src/engine.mjs && node --check public/app.mjs && node --check src/acervo-catalogo.mjs && node --check public/kit.mjs && node --check src/kit/teaser.mjs && node --check public/acervo.mjs && npm run typecheck"
+    "check": "node --check server.mjs && node --check src/engine.mjs && node --check public/app.mjs && node --check src/acervo-catalogo.mjs && node --check public/kit.mjs && node --check public/shell.mjs && node --check src/kit/teaser.mjs && node --check public/acervo.mjs && npm run typecheck"
   },
   "dependencies": {
     "playwright-core": "1.65.1",

@@ -31,25 +31,65 @@ document.querySelectorAll('#etapa1 input, #etapa1 select').forEach((el) => {
 function marcar(ids) {
   document.querySelectorAll('#k-pecas input[type=checkbox]').forEach((c) => { c.checked = ids.includes(c.value); });
 }
+const ICONES = {
+  web: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/>',
+  social: '<rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/>',
+  projecao: '<rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/>',
+  impressos: '<path d="M6 9V3h12v6M6 18H4v-7h16v7h-2"/><rect x="6" y="14" width="12" height="7"/>',
+  video: '<rect x="3" y="5" width="14" height="14" rx="2"/><path d="M17 10l4-2v8l-4-2"/>',
+};
+function icone(cat) {
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('viewBox', '0 0 24 24'); svg.setAttribute('fill', 'none'); svg.setAttribute('stroke', 'currentColor');
+  svg.setAttribute('stroke-width', '2'); svg.setAttribute('stroke-linecap', 'round'); svg.setAttribute('stroke-linejoin', 'round');
+  svg.setAttribute('aria-hidden', 'true');
+  svg.innerHTML = ICONES[cat] || ICONES.web; // constante local, sem entrada do usuário
+  return svg;
+}
 function montarPecas() {
   const root = $('k-pecas'); root.textContent = '';
   for (const cat of catalogo.categorias) {
-    const h = document.createElement('h3'); h.textContent = cat.name; root.append(h);
+    const h = document.createElement('h3'); h.className = 'cat-title'; h.textContent = cat.name; root.append(h);
+    const grid = document.createElement('div'); grid.className = 'piece-grid';
     for (const p of catalogo.pecas.filter((x) => x.category === cat.id)) {
-      const l = document.createElement('label'); l.style.display = 'block';
-      const c = document.createElement('input'); c.type = 'checkbox'; c.value = p.id; c.style.width = 'auto'; c.style.marginRight = '8px';
-      const size = p.height ? ` (${p.width}×${p.height} ${p.unit || 'px'})` : '';
-      const proof = p.print?.provisional ? ' · prova 1:10, gabarito a confirmar' : '';
-      l.append(c, p.name + size + proof); root.append(l);
+      const l = document.createElement('label'); l.className = 'piece';
+      const c = document.createElement('input'); c.type = 'checkbox'; c.value = p.id;
+      const txt = document.createElement('span');
+      const n = document.createElement('span'); n.className = 'pn'; n.textContent = p.name;
+      const d = document.createElement('span'); d.className = 'pd';
+      const size = p.height ? `${p.width}×${p.height} ${p.unit || 'px'}` : `${p.width} px de largura`;
+      d.textContent = size + (p.print?.provisional ? ' · prova 1:10, gabarito a confirmar' : '');
+      txt.append(n, d); l.append(c, icone(cat.id), txt); grid.append(l);
     }
+    root.append(grid);
   }
   const pr = $('k-presets'); pr.textContent = '';
   for (const preset of catalogo.presets) {
-    const b = document.createElement('button'); b.type = 'button'; b.textContent = preset.name;
-    b.addEventListener('click', () => marcar(preset.pieces)); pr.append(b, ' ');
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'btn btn-chip'; b.textContent = preset.name;
+    b.addEventListener('click', () => marcar(preset.pieces)); pr.append(b);
   }
   marcar(catalogo.presets[0].pieces);
 }
+
+$('k-ai').addEventListener('click', async () => {
+  const btn = $('k-ai'); const st = $('k-ai-status');
+  const briefing = $('k-ai-texto').value.trim();
+  if (briefing.length < 10) { st.textContent = 'Descreva o negócio em pelo menos 10 caracteres.'; return; }
+  btn.disabled = true; st.textContent = 'Preenchendo…';
+  try {
+    const r = await post('/api/kit/ai-fill', { briefing });
+    const j = await lerJsonSeguro(r);
+    if (!r.ok || !j?.ok) { st.textContent = j?.erro || `Falha ao preencher (HTTP ${r.status}).`; return; }
+    const m = { marca: 'k-marca', nicho: 'k-nicho', slogan: 'k-slogan', subtitulo: 'k-sub', modelo: 'k-modelo' };
+    for (const [campo, id] of Object.entries(m)) if (j.campos[campo]) $(id).value = j.campos[campo];
+    invalidarIdentidade();
+    st.textContent = (j.origem === 'deterministic' ? 'Preenchido por regras locais' : 'Preenchido por IA') + ' — revise e clique em "Validar identidade".';
+  } catch {
+    st.textContent = 'Erro de rede. Tente novamente.';
+  } finally {
+    btn.disabled = false;
+  }
+});
 
 $('k-validar').addEventListener('click', async () => {
   const btn = $('k-validar');

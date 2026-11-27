@@ -7,55 +7,68 @@
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-  <aside>
-    <a class="brand" href="/">SV<span>P</span><small>STUDIO VISUAL PRO</small></a>
-    <nav>
-      <a href="/">01 &nbsp; Briefing</a>
-      <a href="/website">06 &nbsp; Criador de Sites</a>
-      <a href="/kit" style="font-weight:700;opacity:1">07 &nbsp; Kit em Lote</a>
-    </nav>
-  </aside>
-  <main>
+  <main class="kit">
     <header>
-      <p class="eyebrow">07 · KIT EM LOTE</p>
-      <h1>Identidade visual + todas as peças de uma vez</h1>
-      <p class="lead">Etapa 1: valide a identidade base. Etapa 2: marque as peças e baixe o ZIP organizado por pastas.</p>
+      <div>
+        <p class="eyebrow">07 · KIT EM LOTE</p>
+        <h1>Identidade visual + todas as peças de uma vez</h1>
+        <p class="lead">Etapa 1: valide a identidade base. Etapa 2: marque as peças e baixe o ZIP organizado por pastas.</p>
+      </div>
     </header>
     <section class="card" id="etapa1">
       <h2>Etapa 1 — Identidade Visual Base</h2>
-      <label for="k-marca">Marca</label><input id="k-marca" maxlength="60" value="Connect">
-      <label for="k-nicho">Nicho (usado para a foto-base)</label><input id="k-nicho" maxlength="80" value="Clínica odontológica">
-      <label for="k-slogan">Título principal</label><input id="k-slogan" maxlength="140" value="Seu sorriso, com cuidado de verdade.">
-      <label for="k-sub">Subtítulo</label><input id="k-sub" maxlength="200" value="Atendimento premium com acolhimento.">
-      <label for="k-data">Data (opcional, texto exato)</label><input id="k-data" maxlength="80">
-      <label for="k-local">Local (opcional)</label><input id="k-local" maxlength="120">
-      <label for="k-modelo">Modelo visual</label>
-      <select id="k-modelo"><option value="tech-cinematografico">Tech Cinema</option><option value="editorial-clean">Editorial Luxo</option><option value="comercial-conversao">Alta Conversão</option></select>
-      <p><button type="button" id="k-validar">Validar identidade</button></p>
+      <div class="ai-card">
+        <label class="lbl" for="k-ai-texto">Briefing inteligente (1 clique)</label>
+        <textarea id="k-ai-texto" class="ctl" rows="3" maxlength="1200" placeholder="Ex.: Clínica odontológica premium em Londrina, focada em lentes de contato dental."></textarea>
+        <div class="row">
+          <button type="button" id="k-ai" class="btn btn-primary">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 17v4M17 19h4"/></svg>
+            Preencher Identidade com IA
+          </button>
+          <span id="k-ai-status" class="muted" role="status" aria-live="polite"></span>
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="field"><label class="lbl" for="k-marca">Marca</label><input class="ctl" id="k-marca" maxlength="60" value="Connect"></div>
+        <div class="field"><label class="lbl" for="k-nicho">Nicho (foto-base)</label><input class="ctl" id="k-nicho" maxlength="80" value="Clínica odontológica"></div>
+        <div class="field"><label class="lbl" for="k-slogan">Título principal</label><input class="ctl" id="k-slogan" maxlength="140" value="Seu sorriso, com cuidado de verdade."></div>
+        <div class="field"><label class="lbl" for="k-sub">Subtítulo</label><input class="ctl" id="k-sub" maxlength="200" value="Atendimento premium com acolhimento."></div>
+        <div class="field"><label class="lbl" for="k-data">Data (opcional)</label><input class="ctl" id="k-data" maxlength="80"></div>
+        <div class="field"><label class="lbl" for="k-local">Local (opcional)</label><input class="ctl" id="k-local" maxlength="120"></div>
+        <div class="field full"><label class="lbl" for="k-modelo">Modelo visual</label>
+          <select class="ctl" id="k-modelo"><option value="tech-cinematografico">Tech Cinema</option><option value="editorial-clean">Editorial Luxo</option><option value="comercial-conversao">Alta Conversão</option></select></div>
+      </div>
+      <div class="row"><button type="button" id="k-validar" class="btn btn-primary">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+        Validar identidade</button></div>
       <div id="k-identidade" aria-live="polite"></div>
     </section>
     <section class="card" id="etapa2" hidden>
       <h2>Etapa 2 — Peças do lote</h2>
-      <p id="k-presets"></p>
+      <div id="k-presets" class="row"></div>
       <div id="k-pecas"></div>
-      <p><label><input type="checkbox" id="k-zip-teaser" style="width:auto;margin-right:8px">Incluir teaser de 60 s (MP4) na pasta video/ do ZIP</label></p>
-      <p><button type="button" id="k-gerar">Gerar lote e baixar ZIP</button></p>
+      <label class="opt"><input type="checkbox" id="k-zip-teaser"><span>Incluir teaser de 60 s (MP4) na pasta video/ do ZIP</span></label>
+      <div class="row"><button type="button" id="k-gerar" class="btn btn-primary">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v3h16v-3"/></svg>
+        Gerar lote e baixar ZIP</button></div>
       <p id="k-status" aria-live="polite"></p>
       <p class="muted">Impressos em PNG e PDF. Confirme gabarito, perfil de cor e prova visual com a gráfica antes de imprimir.</p>
       <h3>Teaser de 60 segundos</h3>
-      <label for="k-teaser-format">Formato do vídeo</label>
-      <select id="k-teaser-format">
-        <option value="9:16">Vertical 9:16</option>
-        <option value="16:9">Telão 16:9</option>
-      </select>
-      <p><button type="button" id="k-teaser">Gerar teaser</button></p>
+      <div class="form-grid">
+        <div class="field"><label class="lbl" for="k-teaser-format">Formato do vídeo</label>
+          <select class="ctl" id="k-teaser-format"><option value="9:16">Vertical 9:16</option><option value="16:9">Telão 16:9</option></select></div>
+      </div>
+      <div class="row"><button type="button" id="k-teaser" class="btn btn-secondary">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+        Gerar teaser</button></div>
       <p id="k-teaser-status" role="status"></p>
       <div id="k-teaser-result" hidden>
-        <video id="k-teaser-video" controls playsinline preload="metadata" style="max-width:100%;max-height:480px"></video>
-        <p><a id="k-teaser-download" download>Baixar MP4</a></p>
+        <video id="k-teaser-video" controls playsinline preload="metadata" style="max-width:100%;max-height:480px;border-radius:10px"></video>
+        <div class="row"><a id="k-teaser-download" class="btn btn-secondary" download>Baixar MP4</a></div>
       </div>
     </section>
   </main>
+  <script type="module" src="/shell.mjs"></script>
   <script type="module" src="/kit.mjs"></script>
 </body>
 </html>

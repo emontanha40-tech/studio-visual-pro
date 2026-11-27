@@ -9,6 +9,7 @@ import { KIT_PIECES, PRESETS, CATEGORIES } from './src/kit/catalog.mjs';
 import { buildIdentity } from './src/kit/identity.mjs';
 import { buildKit } from './src/kit/batch.mjs';
 import { createTeaserQueue } from './src/kit/teaser.mjs';
+import { fillQuickBrief } from './src/brand/quickBrief.mjs';
 import { generateKit } from './src/brand/kitService.mjs';
 import { openProjectStore, isKitId } from './src/brand/projectStore.mjs';
 import { generateCampaignPiece, publishedFile, PUBLISHED_DIR } from './src/brand/campaignService.mjs';
@@ -51,6 +52,7 @@ const routes = new Map([
   ['/app.mjs', ['public/app.mjs', 'text/javascript']],
   ['/website.mjs', ['public/website.mjs', 'text/javascript']],
   ['/kit', ['public/kit.html', 'text/html']],
+  ['/shell.mjs', ['public/shell.mjs', 'text/javascript']],
   ['/kit.mjs', ['public/kit.mjs', 'text/javascript']],
   ['/showcase.mjs', ['public/showcase.mjs', 'text/javascript']],
   ['/style.css', ['public/style.css', 'text/css']],
@@ -209,6 +211,22 @@ export function createServer({ lerAcervo = carregarAcervo, campaignQueue = null,
         } else {
           res.writeHead(200, { ...headers, 'Content-Length': video.length }).end(video);
         }
+      }
+      return;
+    }
+
+    if (req.method === 'POST' && pathname === '/api/kit/ai-fill') {
+      try {
+        const { briefing } = await readJsonBody(req);
+        const r = await fillQuickBrief(String(briefing ?? ''));
+        const modelo = { saas_modern: 'tech-cinematografico', local_authority: 'editorial-clean', product_launch: 'comercial-conversao' }[r.archetype] || 'tech-cinematografico';
+        const cut = (t, n) => String(t).slice(0, n);
+        sendJson(res, 200, { ok: true, origem: r.source, campos: {
+          marca: cut(r.tokens?.brand_name ?? r.brand_name ?? '', 60), nicho: cut(String(briefing).trim(), 80),
+          slogan: cut(r.headline, 140), subtitulo: cut(r.subtitle, 200), modelo,
+        } });
+      } catch (err) {
+        sendJson(res, 400, { ok: false, erro: err instanceof Error ? err.message : 'Não foi possível preencher a identidade.' });
       }
       return;
     }
