@@ -9,3 +9,5 @@ exports/
 
 # Acervo comprado: arquivos locais privados
 /acervo-local/infograficompanies/
+public/published/
+.git-svp-fatia6-backup/

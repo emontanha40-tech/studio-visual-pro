@@ -5,6 +5,9 @@ import { promisify } from 'node:util';
 import path from 'node:path';
 import { carregarAcervo } from './src/acervo-catalogo.mjs';
 import { extractSemanticBriefing, BRAND_KITS } from './src/website/brandKit.mjs';
+import { KIT_PIECES, PRESETS, CATEGORIES } from './src/kit/catalog.mjs';
+import { buildIdentity } from './src/kit/identity.mjs';
+import { buildKit } from './src/kit/batch.mjs';
 import { pathToFileURL } from 'node:url';
 import { readFile } from 'node:fs/promises';
 import { CampaignQueue } from './src/queues/campaignQueue.ts';
@@ -24,11 +27,18 @@ if (existsSync(envPath) && typeof process.loadEnvFile === 'function') {
 
 const port = Number(process.env.PORT || 4173);
 const bindHost = process.env.BIND_HOST || '127.0.0.1';
-const extraHosts = (process.env.ALLOWED_HOSTS || '')
+const rawExtraHosts = (process.env.ALLOWED_HOSTS || '')
   .split(',')
   .map((h) => h.trim())
   .filter(Boolean);
 const MAX_BODY_BYTES = 64 * 1024;
+
+function normalizeAllowedHosts(hosts, serverPort) {
+  return hosts
+    .map((h) => String(h).trim())
+    .filter(Boolean)
+    .flatMap((h) => (h.includes(':') ? [h] : [h, `${h}:${serverPort}`]));
+}
 
 const routes = new Map([
   ['/', ['public/index.html', 'text/html']],
@@ -36,6 +46,8 @@ const routes = new Map([
   ['/showcase', ['public/showcase.html', 'text/html']],
   ['/app.mjs', ['public/app.mjs', 'text/javascript']],
   ['/website.mjs', ['public/website.mjs', 'text/javascript']],
+  ['/kit', ['public/kit.html', 'text/html']],
+  ['/kit.mjs', ['public/kit.mjs', 'text/javascript']],
   ['/showcase.mjs', ['public/showcase.mjs', 'text/javascript']],
   ['/style.css', ['public/style.css', 'text/css']],
   ['/engine.mjs', ['src/engine.mjs', 'text/javascript']],
@@ -81,13 +93,14 @@ function getDefaultQueue() {
 }
 
 /**
- * @param {{ lerAcervo?: typeof carregarAcervo, campaignQueue?: CampaignQueue | null }} [options]
+ * @param {{ lerAcervo?: typeof carregarAcervo, campaignQueue?: CampaignQueue | null, extraAllowedHosts?: string[] }} [options]
  */
-export function createServer({ lerAcervo = carregarAcervo, campaignQueue = null } = {}) {
+export function createServer({ lerAcervo = carregarAcervo, campaignQueue = null, extraAllowedHosts = rawExtraHosts } = {}) {
   let activeQueue = campaignQueue ?? null;
+  const normalizedExtraHosts = normalizeAllowedHosts(extraAllowedHosts, port);
 
   return http.createServer(async (req, res) => {
-    const allowedHosts = [`127.0.0.1:${port}`, `localhost:${port}`, ...extraHosts];
+    const allowedHosts = [`127.0.0.1:${port}`, `localhost:${port}`, ...normalizedExtraHosts];
     if (!allowedHosts.includes(req.headers.host)) {
       res.writeHead(403);
       res.end('Host recusado');
@@ -109,6 +122,32 @@ export function createServer({ lerAcervo = carregarAcervo, campaignQueue = null 
         const message = err instanceof Error ? err.message : 'Falha ao iniciar produção.';
         const status = /FAL_KEY|GEMINI_API_KEY/.test(message) ? 503 : 400;
         sendJson(res, status, { erro: message });
+      }
+      return;
+    }
+
+    if (req.method === 'POST' && pathname === '/api/kit/identity') {
+      try {
+        sendJson(res, 200, { ok: true, identidade: buildIdentity(await readJsonBody(req)) });
+      } catch (err) {
+        sendJson(res, 400, { ok: false, erro: err instanceof Error ? err.message : 'Identidade inválida.' });
+      }
+      return;
+    }
+
+    if (req.method === 'POST' && pathname === '/api/kit/build') {
+      try {
+        const { zip, manifest } = await buildKit(await readJsonBody(req));
+        res.writeHead(200, {
+          'Content-Type': 'application/zip',
+          'Content-Disposition': 'attachment; filename="kit-studio-visual-pro.zip"',
+          'X-Kit-Pecas': String(manifest.pecas.length),
+          'Cache-Control': 'no-store',
+          'X-Content-Type-Options': 'nosniff',
+        });
+        res.end(zip);
+      } catch (err) {
+        sendJson(res, 400, { ok: false, erro: err instanceof Error ? err.message : 'Falha ao gerar kit.' });
       }
       return;
     }
@@ -182,6 +221,11 @@ export function createServer({ lerAcervo = carregarAcervo, campaignQueue = null 
       return;
     }
 
+    if (pathname === '/api/kit/catalog') {
+      sendJson(res, 200, { categorias: CATEGORIES, pecas: KIT_PIECES, presets: PRESETS });
+      return;
+    }
+
     if (pathname === '/api/acervo') {
       try {
         const catalogo = await lerAcervo();
@@ -207,7 +251,7 @@ export function createServer({ lerAcervo = carregarAcervo, campaignQueue = null 
         'X-Content-Type-Options': 'nosniff',
         'Referrer-Policy': 'no-referrer',
         'Content-Security-Policy':
-          "default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' blob: https:; media-src 'self' https:; frame-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
+          "default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https:; media-src 'self' https:; frame-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
       });
       res.end(body);
     } catch {

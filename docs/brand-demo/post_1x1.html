@@ -1,0 +1,89 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Connect Soluções</title><style>
+@font-face{font-family:'Poppins';src:url('file:///home/ubuntu/workspaces/Projetos/maquina-edicao-ia/studio-visual-pro/assets/fonts/Poppins-Variable.woff2') format('woff2');font-weight:300 800;font-display:swap}
+@font-face{font-family:'Inter';src:url('file:///home/ubuntu/workspaces/Projetos/maquina-edicao-ia/studio-visual-pro/assets/fonts/Inter-Variable.woff2') format('woff2');font-weight:100 900;font-display:swap}
+:root{
+  --color-primary: #1E3A8A;
+  --color-secondary: #0EA5E9;
+  --color-accent: #F59E0B;
+  --color-background-main: #FFFFFF;
+  --color-surface-card: #F1F5F9;
+  --color-text-primary: #0F172A;
+  --color-text-muted: #475569;
+  --color-cta-bg: #1E3A8A;
+  --color-cta-text: #FFFFFF;
+  --font-heading: 'Poppins', sans-serif;
+  --font-body: 'Inter', sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%}
+body{font-family:var(--font-body);background:var(--color-background-main);color:var(--color-text-primary);overflow:hidden}
+body.is-landing{height:auto;min-height:100%;overflow-x:hidden;overflow-y:auto}
+h1,h2,h3{font-family:var(--font-heading);line-height:1.12}
+.logo svg{height:100%;width:auto;display:block}
+.cta{display:inline-block;background:var(--color-cta-bg);color:var(--color-cta-text);font-family:var(--font-heading);font-weight:700;border-radius:999px;text-decoration:none}
+.muted{color:var(--color-text-muted)}
+.card{background:var(--color-surface-card);border-radius:24px}
+.hero-img{width:100%;height:100%;object-fit:cover}
+.banner,.post{position:relative;width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;gap:3vmin;padding:8vmin;overflow:hidden}
+.banner h1{font-size:9vmin;max-width:80%}.banner p{font-size:3.4vmin}.banner .cta,.post .cta{font-size:3.2vmin;padding:2vmin 5vmin;align-self:flex-start}
+.g{position:absolute;border-radius:50%;z-index:0}.g1{width:60vmin;height:60vmin;right:-15vmin;top:-15vmin;background:var(--color-primary);opacity:.9}
+.g2{width:36vmin;height:36vmin;right:12vmin;bottom:-12vmin;background:var(--color-accent);opacity:.85}
+.banner>*:not(.g),.over{position:relative;z-index:1}
+.post .hero-img{position:absolute;inset:0}.post .over{margin-top:auto;display:flex;flex-direction:column;gap:3vmin;background:linear-gradient(transparent,var(--color-surface-card));padding:4vmin;border-radius:24px}
+.post h1{font-size:7vmin}
+.story{position:relative;width:100%;height:100%;overflow:hidden;background:var(--color-background-main)}
+.story-bg{position:absolute;inset:0;z-index:0}
+.sg1{width:720px;height:720px;right:-240px;top:-160px;background:var(--color-primary);opacity:.22}
+.sg2{width:620px;height:620px;left:-200px;bottom:-140px;background:var(--color-accent);opacity:.24}
+.story-safe{position:relative;z-index:1;width:100%;height:100%;padding:250px 72px 320px;display:flex;flex-direction:column;justify-content:space-between;gap:40px}
+.story-logo{height:76px;max-width:100%}
+.story-copy{display:flex;flex-direction:column;gap:28px;background:var(--color-surface-card);padding:48px;border-radius:32px}
+.story-copy h1{font-size:76px;line-height:1.08;overflow-wrap:break-word}
+.story-sub{font-size:34px;line-height:1.35;overflow-wrap:break-word}
+.story-foot{display:flex;justify-content:flex-start}
+.story-cta{font-size:36px;padding:26px 56px}
+.landing{width:100%;background:var(--color-background-main);color:var(--color-text-primary)}
+.lp-wrap{width:100%;max-width:1120px;margin:0 auto;padding:0 32px}
+.lp-header{border-bottom:1px solid var(--color-surface-card);padding:20px 0}
+.lp-nav{display:flex;align-items:center;justify-content:space-between;gap:24px}
+.lp-logo{height:44px}.lp-logo-sm{height:34px}
+.lp-nav-cta{font-size:15px;padding:12px 24px}
+.lp-hero{padding:72px 0}
+.lp-hero-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:48px;align-items:center}
+.lp-badge{display:inline-block;background:var(--color-surface-card);color:var(--color-primary);font-family:var(--font-heading);font-weight:700;font-size:13px;padding:6px 14px;border-radius:999px;margin-bottom:20px}
+.lp-hero-copy h1{font-size:52px;margin-bottom:20px}
+.lp-sub{font-size:19px;line-height:1.55;margin-bottom:32px;max-width:54ch}
+.lp-cta{font-size:17px;padding:16px 34px}
+.lp-media{position:relative;min-height:360px;border-radius:28px;overflow:hidden;background:var(--color-surface-card);display:flex;align-items:center;justify-content:center;padding:32px}
+.lp-orb{position:absolute;border-radius:50%}.lp-orb1{width:260px;height:260px;right:-60px;top:-60px;background:var(--color-primary);opacity:.85}
+.lp-orb2{width:180px;height:180px;left:-40px;bottom:-40px;background:var(--color-accent);opacity:.85}
+.lp-geo-card{position:relative;z-index:1;background:var(--color-background-main);border-radius:20px;padding:28px;display:flex;flex-direction:column;gap:8px;max-width:85%;box-shadow:0 16px 40px rgba(15,23,42,.12)}
+.lp-geo-card strong{font-family:var(--font-heading);font-size:22px}
+.lp-features{padding:64px 0;background:var(--color-surface-card)}
+.lp-sec-title{font-size:34px;margin-bottom:36px}
+.lp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.lp-card{background:var(--color-background-main);padding:28px;display:flex;flex-direction:column;gap:12px}
+.lp-card h3{font-size:20px}.lp-card p{font-size:15px;line-height:1.5}
+.lp-cta-band{padding:64px 0}
+.lp-cta-box{background:var(--color-surface-card);border-radius:28px;padding:44px;display:flex;align-items:center;justify-content:space-between;gap:32px}
+.lp-cta-box h2{font-size:30px;margin-bottom:8px}
+.lp-footer{padding:32px 0;border-top:1px solid var(--color-surface-card)}
+.lp-foot-row{display:flex;align-items:center;justify-content:space-between;gap:16px}
+@media (max-width:860px){.lp-hero-grid,.lp-grid{grid-template-columns:1fr}.lp-cta-box{flex-direction:column;align-items:flex-start}}
+:root{--ease-cine:cubic-bezier(0.16,1,0.3,1)}
+.lp-header{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--color-background-main) 78%,transparent);-webkit-backdrop-filter:blur(14px) saturate(1.4);backdrop-filter:blur(14px) saturate(1.4)}
+.lp-geo-card{background:color-mix(in srgb,var(--color-background-main) 72%,transparent);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border:1px solid color-mix(in srgb,var(--color-background-main) 60%,transparent)}
+.lp-card{transition:transform .6s var(--ease-cine),box-shadow .6s var(--ease-cine)}
+.lp-card:hover{transform:translateY(-6px);box-shadow:0 18px 40px rgba(15,23,42,.14)}
+.landing .cta{transition:transform .45s var(--ease-cine),box-shadow .45s var(--ease-cine)}
+.landing .cta:hover{transform:translateY(-2px) scale(1.04);box-shadow:0 10px 28px rgba(15,23,42,.22)}
+.lp-orb{animation:lp-float 9s var(--ease-cine) infinite alternate}
+@keyframes lp-float{to{transform:translate3d(-14px,18px,0) scale(1.06)}}
+html.js-motion [data-reveal]{opacity:0;transform:translate3d(0,32px,0);transition:opacity .95s var(--ease-cine),transform .95s var(--ease-cine);transition-delay:calc(var(--i,0)*110ms);will-change:opacity,transform}
+html.js-motion [data-reveal].is-in{opacity:1;transform:none}
+html.is-static [data-reveal]{opacity:1!important;transform:none!important;transition:none!important}
+html.is-static .lp-orb{animation:none}
+@media (prefers-reduced-motion:reduce){.lp-orb{animation:none}.lp-card,.landing .cta{transition:none}}
+</style></head><body><main class="post"><i class="g g1"></i><i class="g g2"></i>
+<div class="over"><div class="logo" style="height:9vmin"><svg viewBox="0 0 454 80" role="img" aria-label="Connect Soluções" preserveAspectRatio="xMinYMid meet"><title>Connect Soluções</title><circle cx="40" cy="40" r="32" fill="#1E3A8A"/><rect x="24" y="24" width="32" height="32" rx="6" fill="#0EA5E9" transform="rotate(45 40 40)"/><circle cx="40" cy="40" r="7" fill="#F59E0B"/><text x="88" y="40" dominant-baseline="central" font-family="'Poppins', sans-serif" font-weight="700" font-size="36" fill="#0F172A" textLength="358" lengthAdjust="spacingAndGlyphs">Connect Soluções</text></svg></div><h1>Tecnologia que conecta</h1><span class="cta">Fale conosco</span></div></main></body></html>
