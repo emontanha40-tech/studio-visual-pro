@@ -66,3 +66,7 @@
 - `npm run homologar` aprovado em 84/84 verificações com teaser H.264, fluxo `/estilo → /kit` em 1440 px e 390 px e download dos dois ZIPs.
 
 - Checkpoint automático Assessor Studio (2026-11-28 02:45 UTC).
+
+- Checkpoint automático Assessor Studio (2026-11-28 02:45 UTC).
+
+- Checkpoint automático Assessor Studio (2026-11-28 02:48 UTC).
