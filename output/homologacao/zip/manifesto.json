@@ -1,0 +1,412 @@
+{
+  "gerado_em": "2026-11-27T21:18:10.717Z",
+  "marca": "Igreja Vida Nova",
+  "pecas": [
+    {
+      "id": "landing",
+      "arquivo": "site/landing/index.html",
+      "sha256": "0491b35c1f2160ab62a37a3d6224f2344641c642d1b3bed371d31fbc228c74e8"
+    },
+    {
+      "id": "linktree",
+      "arquivo": "site/linktree/index.html",
+      "sha256": "809112283ee08acb7bcd79cee01c9a73e1a90f1dd6fb0d9523016b60b0ead6e9"
+    },
+    {
+      "id": "hotsite",
+      "arquivo": "site/hotsite/index.html",
+      "sha256": "309332f62d77e7a5cb8148d3998b805bc3bcc9f994ac8c2ecab5d8dd219a641c"
+    },
+    {
+      "id": "email-kit",
+      "arquivo": "site/email-kit/index.html",
+      "arquivos": [
+        "site/email-kit/index.html",
+        "site/email-kit/assinatura-email.html",
+        "site/email-kit/cabecalho-newsletter.html"
+      ],
+      "sha256": "392f5d33a7f2f5df9d04accf5461f4455cfcf06ac6f6607d51cb6894d73e4ef8"
+    },
+    {
+      "id": "feed",
+      "arquivo": "social/feed-1080x1350.png",
+      "vetor": "social/feed-1080x1350.svg",
+      "largura": 1080,
+      "altura": 1350,
+      "png_px": {
+        "largura": 2160,
+        "altura": 2700
+      },
+      "retina": 2,
+      "sha256": "37ff0f706eab6fd03077f7134767998dbee66bb3add4fbfe4ae4f3021bc37e81"
+    },
+    {
+      "id": "story",
+      "arquivo": "social/story-1080x1920.png",
+      "vetor": "social/story-1080x1920.svg",
+      "largura": 1080,
+      "altura": 1920,
+      "png_px": {
+        "largura": 2160,
+        "altura": 3840
+      },
+      "retina": 2,
+      "sha256": "27e945ce2937fcb9000625132884301686069c36ee48c1fa287c3c747013d73f"
+    },
+    {
+      "id": "whatsapp",
+      "arquivo": "social/whatsapp-1080x1080.png",
+      "vetor": "social/whatsapp-1080x1080.svg",
+      "largura": 1080,
+      "altura": 1080,
+      "png_px": {
+        "largura": 2160,
+        "altura": 2160
+      },
+      "retina": 2,
+      "sha256": "d13aaacfd655109cf105bd7fafb56092aad570c4a19af733a036f1528fce7b8a"
+    },
+    {
+      "id": "banner",
+      "arquivo": "social/banner-1200x628.png",
+      "vetor": "social/banner-1200x628.svg",
+      "largura": 1200,
+      "altura": 628,
+      "png_px": {
+        "largura": 2400,
+        "altura": 1256
+      },
+      "retina": 2,
+      "sha256": "ebe8194d64ba29cbb2426cee50ec285c210ff604a72ac219908698dc55fc600b"
+    },
+    {
+      "id": "screen",
+      "arquivo": "projecao/screen-1920x1080.png",
+      "vetor": "projecao/screen-1920x1080.svg",
+      "largura": 1920,
+      "altura": 1080,
+      "png_px": {
+        "largura": 3840,
+        "altura": 2160
+      },
+      "retina": 2,
+      "sha256": "31ad260a24864275fe5c801569cf938f876d3891c5293d96d7ef2922c82876b0"
+    },
+    {
+      "id": "slide-capa",
+      "arquivo": "projecao/slide-capa-1920x1080.png",
+      "vetor": "projecao/slide-capa-1920x1080.svg",
+      "largura": 1920,
+      "altura": 1080,
+      "png_px": {
+        "largura": 3840,
+        "altura": 2160
+      },
+      "retina": 2,
+      "sha256": "e54ca61ff20f42602f38b77b33d576de4558f83631a46be2f9fc93ebcb5d7913"
+    },
+    {
+      "id": "slide-fundo",
+      "arquivo": "projecao/slide-fundo-1920x1080.png",
+      "vetor": "projecao/slide-fundo-1920x1080.svg",
+      "largura": 1920,
+      "altura": 1080,
+      "png_px": {
+        "largura": 3840,
+        "altura": 2160
+      },
+      "retina": 2,
+      "sha256": "d49727239351450dab63cbde1f8833b4c6d4b2078d6aa72798443debadeb2528"
+    },
+    {
+      "id": "lower-third",
+      "arquivo": "projecao/lower-third-1920x1080.png",
+      "vetor": "projecao/lower-third-1920x1080.svg",
+      "largura": 1920,
+      "altura": 1080,
+      "png_px": {
+        "largura": 3840,
+        "altura": 2160
+      },
+      "retina": 2,
+      "sha256": "009d50b2d3227e050f04fd942a8cf60b6d7f016ac624909bc7296f2b5054ca7f"
+    },
+    {
+      "id": "welcome-countdown",
+      "arquivo": "projecao/welcome-countdown-1920x1080.png",
+      "vetor": "projecao/welcome-countdown-1920x1080.svg",
+      "largura": 1920,
+      "altura": 1080,
+      "png_px": {
+        "largura": 3840,
+        "altura": 2160
+      },
+      "retina": 2,
+      "sha256": "915df8b1e0c1075ae4b93b9d42cdc6057cd4512e00810335d45f01788ab601af"
+    },
+    {
+      "id": "invitation",
+      "arquivo": "impressos/invitation-frente.png",
+      "sha256": "564b4082a022a78817162c435da49d82669b917d8531313fdc97cecc1e7368d4",
+      "arquivos": [
+        {
+          "arquivo": "impressos/invitation-frente.png",
+          "lado": "frente",
+          "formato": "png",
+          "sha256": "564b4082a022a78817162c435da49d82669b917d8531313fdc97cecc1e7368d4"
+        },
+        {
+          "arquivo": "impressos/invitation-frente.pdf",
+          "lado": "frente",
+          "formato": "pdf",
+          "sha256": "ef3ad8531b067c966af50531665e376b1ef8278e350e17902ffe377c2eba30fe"
+        },
+        {
+          "arquivo": "impressos/invitation-verso.png",
+          "lado": "verso",
+          "formato": "png",
+          "sha256": "4441f4788c5af96a06faf2602cdbe3886a4b6144bc2c2d9ad9a792ac65d0435c"
+        },
+        {
+          "arquivo": "impressos/invitation-verso.pdf",
+          "lado": "verso",
+          "formato": "pdf",
+          "sha256": "c235a01c43cfd46e733673ee934410f87e5f17acafe90cabe86a423f3cd11623"
+        }
+      ],
+      "corte_final_mm": {
+        "largura": 100,
+        "altura": 150
+      },
+      "sangria_final_mm": 3,
+      "escala": "1:1",
+      "dpi": 300,
+      "png_px": {
+        "largura": 1252,
+        "altura": 1843
+      },
+      "gabarito_provisorio": false
+    },
+    {
+      "id": "prayer",
+      "arquivo": "impressos/prayer-frente.png",
+      "sha256": "15af72e0ae6d5e315c234bfeb5c84fcb76e25c34ec6a10aefbc3d58d57b5fa09",
+      "arquivos": [
+        {
+          "arquivo": "impressos/prayer-frente.png",
+          "lado": "frente",
+          "formato": "png",
+          "sha256": "15af72e0ae6d5e315c234bfeb5c84fcb76e25c34ec6a10aefbc3d58d57b5fa09"
+        },
+        {
+          "arquivo": "impressos/prayer-frente.pdf",
+          "lado": "frente",
+          "formato": "pdf",
+          "sha256": "a7e0657e2899274b4e145fad00635f53f8b6f9a11a245c627f5c73937cba9d19"
+        }
+      ],
+      "corte_final_mm": {
+        "largura": 148,
+        "altura": 210
+      },
+      "sangria_final_mm": 3,
+      "escala": "1:1",
+      "dpi": 300,
+      "png_px": {
+        "largura": 1819,
+        "altura": 2551
+      },
+      "gabarito_provisorio": false
+    },
+    {
+      "id": "decision",
+      "arquivo": "impressos/decision-frente.png",
+      "sha256": "a5e4171cf76f7e2f053106cf398f719f229bef513de185d5aa3f46c47972a279",
+      "arquivos": [
+        {
+          "arquivo": "impressos/decision-frente.png",
+          "lado": "frente",
+          "formato": "png",
+          "sha256": "a5e4171cf76f7e2f053106cf398f719f229bef513de185d5aa3f46c47972a279"
+        },
+        {
+          "arquivo": "impressos/decision-frente.pdf",
+          "lado": "frente",
+          "formato": "pdf",
+          "sha256": "46895e129ea872e71e2e7c54ab78ad3e1fe863a5f16f0890a8e8015563b59370"
+        }
+      ],
+      "corte_final_mm": {
+        "largura": 148,
+        "altura": 105
+      },
+      "sangria_final_mm": 3,
+      "escala": "1:1",
+      "dpi": 300,
+      "png_px": {
+        "largura": 1819,
+        "altura": 1311
+      },
+      "gabarito_provisorio": false
+    },
+    {
+      "id": "bookmark",
+      "arquivo": "impressos/bookmark-frente.png",
+      "sha256": "9311768a4259970e266d6bf4545b1f3127e5615c4e54f1fed932765d72efdc4f",
+      "arquivos": [
+        {
+          "arquivo": "impressos/bookmark-frente.png",
+          "lado": "frente",
+          "formato": "png",
+          "sha256": "9311768a4259970e266d6bf4545b1f3127e5615c4e54f1fed932765d72efdc4f"
+        },
+        {
+          "arquivo": "impressos/bookmark-frente.pdf",
+          "lado": "frente",
+          "formato": "pdf",
+          "sha256": "49d94398dcb8cae24f8989a755d7c1eaf9316195e4e5849e97521518f7b11477"
+        },
+        {
+          "arquivo": "impressos/bookmark-verso.png",
+          "lado": "verso",
+          "formato": "png",
+          "sha256": "bc73223f5d06581ca8f424beb13dcab30dd33632531d0df69ff74530a9e1fd3e"
+        },
+        {
+          "arquivo": "impressos/bookmark-verso.pdf",
+          "lado": "verso",
+          "formato": "pdf",
+          "sha256": "8320f34faabf9a5481c3909433a136d8161a68c4964faac4ebc77d5959aa3624"
+        }
+      ],
+      "corte_final_mm": {
+        "largura": 50,
+        "altura": 180
+      },
+      "sangria_final_mm": 3,
+      "escala": "1:1",
+      "dpi": 300,
+      "png_px": {
+        "largura": 661,
+        "altura": 2197
+      },
+      "gabarito_provisorio": false
+    },
+    {
+      "id": "backdrop",
+      "arquivo": "impressos/backdrop-frente.png",
+      "sha256": "522e47f4e6dabc6abd48930226892e9d7d71aa6e4989d9ed3c4ecb9631e02d04",
+      "arquivos": [
+        {
+          "arquivo": "impressos/backdrop-frente.png",
+          "lado": "frente",
+          "formato": "png",
+          "sha256": "522e47f4e6dabc6abd48930226892e9d7d71aa6e4989d9ed3c4ecb9631e02d04"
+        },
+        {
+          "arquivo": "impressos/backdrop-frente.pdf",
+          "lado": "frente",
+          "formato": "pdf",
+          "sha256": "3ece4471dd684da3a798aa2801808d7aad3386ce2785ab050dcc775afa8ce45f"
+        }
+      ],
+      "corte_final_mm": {
+        "largura": 3200,
+        "altura": 1800
+      },
+      "sangria_final_mm": 10,
+      "escala": "1:10",
+      "dpi": 150,
+      "png_px": {
+        "largura": 1902,
+        "altura": 1075
+      },
+      "gabarito_provisorio": true
+    },
+    {
+      "id": "wind",
+      "arquivo": "impressos/wind-frente.png",
+      "sha256": "3f4886cf38429521ac3b6a6ed17dbf6ec166386b17ed3dcd8cf8c0809bc4bb26",
+      "arquivos": [
+        {
+          "arquivo": "impressos/wind-frente.png",
+          "lado": "frente",
+          "formato": "png",
+          "sha256": "3f4886cf38429521ac3b6a6ed17dbf6ec166386b17ed3dcd8cf8c0809bc4bb26"
+        },
+        {
+          "arquivo": "impressos/wind-frente.pdf",
+          "lado": "frente",
+          "formato": "pdf",
+          "sha256": "adfbe43d5ec40a397c518776d0eb1dff1415b1a03975de52cf4614d40e81c57d"
+        }
+      ],
+      "corte_final_mm": {
+        "largura": 700,
+        "altura": 2000
+      },
+      "sangria_final_mm": 10,
+      "escala": "1:10",
+      "dpi": 150,
+      "png_px": {
+        "largura": 425,
+        "altura": 1193
+      },
+      "gabarito_provisorio": true
+    }
+  ],
+  "video": {
+    "arquivo": "video/teaser-60s-9x16.mp4",
+    "formato": "9:16",
+    "duracao_s": 60,
+    "sha256": "5b0a9459961e8015c926454195c1ce37407349132fa9b67d220db3a5cb6d03aa"
+  },
+  "pastas": [
+    "site",
+    "social",
+    "projecao",
+    "impressos",
+    "video",
+    "brand"
+  ],
+  "foto": {
+    "fonte": "acervo-local",
+    "credito": "geral/hero.jpg"
+  },
+  "contraste": [
+    {
+      "papel": "text",
+      "fundo": "bg",
+      "ratio": 8.62,
+      "ok": true
+    },
+    {
+      "papel": "muted",
+      "fundo": "bg",
+      "ratio": 8.62,
+      "ok": true
+    },
+    {
+      "papel": "primary",
+      "fundo": "bg",
+      "ratio": 8.62,
+      "ok": true
+    },
+    {
+      "papel": "onPrimary",
+      "fundo": "primary",
+      "ratio": 20.26,
+      "ok": true
+    }
+  ],
+  "avisos": [
+    "Contraste de \"text\" sobre \"bg\" era 2.06:1; ajustado automaticamente.",
+    "Contraste de \"muted\" sobre \"bg\" era 2.44:1; ajustado automaticamente.",
+    "Contraste de \"primary\" sobre \"bg\" era 2.44:1; ajustado automaticamente."
+  ],
+  "observacoes": [
+    "Peças digitais em PNG Retina (2×, renderizado via Playwright) com SVG vetorial ao lado; homologação visual humana pendente.",
+    "Todo texto vem do briefing informado; nenhum nome, data ou QR Code é gerado por IA.",
+    "Impressos em RGB: PNG com sangria e PDF com sangria e marcas de corte. Confirme gabarito, perfil ICC e prova visual com a gráfica."
+  ]
+}

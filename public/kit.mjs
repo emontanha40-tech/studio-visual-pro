@@ -186,7 +186,18 @@ $('k-gerar').addEventListener('click', async () => {
     const url = URL.createObjectURL(await r.blob());
     const a = document.createElement('a'); a.href = url; a.download = 'kit-studio-visual-pro.zip'; a.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
+    const liveUrl = r.headers.get('X-Kit-Live-Url');
     st.textContent = `Pronto: ${r.headers.get('X-Kit-Pecas')} peças no ZIP.`;
+    if (liveUrl) {
+      const link = document.createElement('a');
+      link.href = liveUrl;
+      link.target = '_blank';
+      link.rel = 'noopener';
+      link.textContent = ' Abrir Site ao Vivo';
+      link.style.marginLeft = '8px';
+      st.append(link);
+    }
+    void carregarHistorico();
   } catch {
     st.textContent = 'Erro de rede ao gerar o lote. Tente novamente.';
   } finally {
@@ -235,3 +246,107 @@ $('k-teaser').addEventListener('click', async () => {
     button.disabled = false;
   }
 });
+
+function formatarDataLote(ms) {
+  try {
+    return new Date(ms).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+  } catch {
+    return '';
+  }
+}
+
+async function duplicarBriefing(lote) {
+  await carregarModelosCustomizados();
+  const b = lote.briefing || {};
+  $('k-marca').value = b.marca || lote.marca || '';
+  $('k-nicho').value = b.nicho || '';
+  $('k-slogan').value = b.slogan || lote.titulo || '';
+  $('k-sub').value = b.subtitulo || '';
+  $('k-data').value = b.data || '';
+  $('k-local').value = b.local || '';
+  const select = $('k-modelo');
+  const modelo = b.modelo || lote.modelo || 'tech-cinematografico';
+  let avisoModelo = '';
+  if ([...select.options].some((o) => o.value === modelo)) {
+    select.value = modelo;
+  } else {
+    select.value = 'tech-cinematografico';
+    avisoModelo = ' (preset visual original não encontrado; selecionado Tech Cinema)';
+  }
+  invalidarIdentidade();
+  $('k-identidade').textContent = `Briefing de "${lote.marca}" duplicado${avisoModelo}. Ajuste os campos desejados e clique em "Validar identidade".`;
+  $('etapa1').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  $('k-marca').focus();
+}
+
+async function carregarHistorico() {
+  const root = $('k-historico');
+  if (!root) return;
+  try {
+    const res = await fetch('/api/kit/history');
+    const data = await lerJsonSeguro(res);
+    if (!res.ok || !data?.ok || !Array.isArray(data.lotes)) {
+      root.textContent = '';
+      const p = document.createElement('p'); p.className = 'muted'; p.textContent = 'Histórico indisponível no momento.';
+      root.append(p);
+      return;
+    }
+    root.textContent = '';
+    if (!data.lotes.length) {
+      const p = document.createElement('p'); p.className = 'muted'; p.textContent = 'Nenhuma campanha gerada ainda. Gere seu primeiro lote acima para salvar automaticamente aqui.';
+      root.append(p);
+      return;
+    }
+    for (const lote of data.lotes) {
+      const card = document.createElement('article');
+      card.className = 'kit-history-card';
+      card.dataset.batchId = lote.id;
+
+      const head = document.createElement('div');
+      head.className = 'kit-history-head';
+      const title = document.createElement('h3');
+      title.textContent = lote.marca;
+      const date = document.createElement('span');
+      date.className = 'kit-history-date';
+      date.textContent = formatarDataLote(lote.created_at);
+      head.append(title, date);
+
+      const slogan = document.createElement('p');
+      slogan.className = 'kit-history-title';
+      slogan.textContent = lote.titulo;
+
+      const meta = document.createElement('div');
+      meta.className = 'kit-history-meta';
+      const b1 = document.createElement('span'); b1.className = 'acervo-badge'; b1.textContent = `${lote.pieces_count} peça(s)`;
+      const b2 = document.createElement('span'); b2.className = 'acervo-badge'; b2.textContent = lote.modelo;
+      meta.append(b1, b2);
+
+      const actions = document.createElement('div');
+      actions.className = 'row kit-history-actions';
+      if (lote.live_url && lote.live_available) {
+        const live = document.createElement('a');
+        live.className = 'btn btn-secondary';
+        live.href = lote.live_url;
+        live.target = '_blank';
+        live.rel = 'noopener';
+        live.textContent = 'Site ao Vivo';
+        actions.append(live);
+      }
+      const dup = document.createElement('button');
+      dup.type = 'button';
+      dup.className = 'btn btn-primary';
+      dup.dataset.duplicar = lote.id;
+      dup.textContent = 'Duplicar Briefing';
+      dup.addEventListener('click', () => { void duplicarBriefing(lote); });
+      actions.append(dup);
+
+      card.append(head, slogan, meta, actions);
+      root.append(card);
+    }
+  } catch {
+    root.textContent = '';
+    const p = document.createElement('p'); p.className = 'muted'; p.textContent = 'Não foi possível carregar as campanhas recentes.';
+    root.append(p);
+  }
+}
+void carregarHistorico();

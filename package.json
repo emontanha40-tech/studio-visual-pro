@@ -11,8 +11,9 @@
     "start": "node server.mjs",
     "test": "node --test tests/*.test.mjs tests/*.test.ts",
     "typecheck": "tsc --noEmit",
-    "check": "node --check server.mjs && node --check src/engine.mjs && node --check public/app.mjs && node --check src/acervo-catalogo.mjs && node --check public/kit.mjs && node --check public/shell.mjs && node --check public/estilo.mjs && node --check src/kit/teaser.mjs && node --check src/kit/webTemplates.mjs && node --check src/engine/design-constitution.mjs && node --check src/style-lab/dna.mjs && node --check src/style-lab/store.mjs && node --check src/style-lab/urlExtractor.mjs && node --check src/style-lab/imageExtractor.mjs && node --check src/style-lab/videoExtractor.mjs && node --check public/acervo.mjs && node --check scripts/agente-homologacao.mjs && npm run typecheck",
-    "homologar": "node scripts/agente-homologacao.mjs"
+    "check": "node --check server.mjs && node --check src/engine.mjs && node --check public/app.mjs && node --check src/acervo-catalogo.mjs && node --check public/kit.mjs && node --check public/shell.mjs && node --check public/estilo.mjs && node --check src/kit/teaser.mjs && node --check src/kit/webTemplates.mjs && node --check src/kit/historyStore.mjs && node --check src/engine/design-constitution.mjs && node --check src/style-lab/dna.mjs && node --check src/style-lab/store.mjs && node --check src/style-lab/urlExtractor.mjs && node --check src/style-lab/imageExtractor.mjs && node --check src/style-lab/videoExtractor.mjs && node --check public/acervo.mjs && node --check scripts/agente-homologacao.mjs && node --check scripts/propagar-constituicao.mjs && npm run typecheck",
+    "homologar": "node scripts/agente-homologacao.mjs",
+    "propagar:constituicao": "node scripts/propagar-constituicao.mjs"
   },
   "dependencies": {
     "playwright-core": "1.65.1",

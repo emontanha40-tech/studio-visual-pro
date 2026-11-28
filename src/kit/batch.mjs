@@ -24,6 +24,8 @@ export async function buildKit(input = {}, { photoResolver = resolvePhoto, now =
     .map((p) => ({ id: p.id, width: p.width, height: p.height, svg: svgs.get(p.id), transparent: Boolean(p.transparent) })));
   const entries = [];
   const items = [];
+  const webPriority = { landing: 1, hotsite: 2, linktree: 3 };
+  let publishedSite = null;
   for (const p of pieces) {
     const dir = FOLDER[p.category];
     if (p.format === 'print') {
@@ -51,6 +53,9 @@ export async function buildKit(input = {}, { photoResolver = resolvePhoto, now =
       entries.push({ name: `${dir}/${p.id}/index.html`, data: html });
       if (photo) entries.push({ name: `${dir}/${p.id}/${photoFile}`, data: photo.bytes });
       items.push({ id: p.id, arquivo: `${dir}/${p.id}/index.html`, sha256: sha(html) });
+      if (!publishedSite || webPriority[p.id] < webPriority[publishedSite.kind]) {
+        publishedSite = { kind: p.id, html, photoFile, photoBytes: photo?.bytes ?? null };
+      }
     } else if (p.id === 'email-kit') {
       const { previewHtml, signatureHtml, newsletterHeaderHtml } = renderEmailKitHTML(identity);
       entries.push(
@@ -100,5 +105,5 @@ export async function buildKit(input = {}, { photoResolver = resolvePhoto, now =
     ],
   };
   entries.push({ name: 'manifesto.json', data: JSON.stringify(manifest, null, 2) });
-  return { zip: createZip(entries), manifest, identity };
+  return { zip: createZip(entries), manifest, identity, publishedSite };
 }

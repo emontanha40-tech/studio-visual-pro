@@ -152,3 +152,13 @@ Anotar objetivo, arquivos alterados, testes executados e resultado, limitações
 - **Verificações:** `npm run check` (`node --check` + `tsc --noEmit`) aprovado; suíte completa `npm test` com **127/127** testes passando; auditoria sem segredos expostos; smoke test HTTP 200 nas rotas `/`, `/kit`, `/estilo`, `/website`, `/showcase` e `/api/style-lab/presets` em `http://100.82.176.70:4173`.
 - **Limitações:** alterações no worktree isolado aguardando integração/commit; homologação humana no iPhone e ativação de chaves pagas (`FAL_KEY` / `GEMINI_API_KEY` / `STYLE_LAB_ENABLE_VISION=1`) pendentes.
 - **Próximo passo:** homologar `/estilo` e `/kit` no iPhone via Tailscale ou replicar as regras globais de Design & Motion nos demais projetos do workspace.
+
+## Bloco 3 — continuidade e homologação (2026-11-27)
+
+- Objetivo. Confirmar propagação, histórico de campanhas e homologação em 1440 px e 390 px.
+- Visto. A auditoria em modo leitura confirmou a Constituição e três blocos completos em 21/21 diretórios. A versão ativa via Tailscale exibiu Campanhas Recentes e restaurou a marca ao clicar em Duplicar Briefing.
+- Alteração. `scripts/agente-homologacao.mjs` passou a preservar os relatórios anteriores e a rolar explicitamente até a base de cada página. O relatório anterior tinha 83/84 verificações. A última ação do Linktree ficava abaixo do trecho percorrido em 390 px.
+- Verificações. `npm run check` aprovado, `npm test` com 130/130 testes, Linktree com 5/5 revelações na checagem focal. O servidor de laboratório respondeu HTTP 200 em duas inicializações e recuperou o briefing do mesmo SQLite.
+- Limite. Só o servidor isolado foi reiniciado. O serviço principal respondeu HTTP 200 via Tailscale e segue o fluxo de revisão e aplicação do worktree. O teste em Safari no iPhone continua sendo uma verificação humana.
+- Resultado final. `npm run homologar` aprovado em 84/84, com ZIP completo, teaser H.264, duplicação e fluxo em 1440 px e 390 px. Relatório local em `exports/bloco-3-auditoria/final/RELATORIO_HOMOLOGACAO.md`.
+- Próximo passo. Abrir `/kit` no Safari via Tailscale e conferir a apresentação com o histórico existente.

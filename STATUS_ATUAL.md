@@ -56,3 +56,13 @@
 - **Bloco 3/3 (Fatia 12 — Laboratório de Estilo):** rota `/estilo` (`public/estilo.html`, `public/estilo.mjs`), extratores de URL, imagem e vídeo (`src/style-lab/`), persistência SQLite, integração com `/kit` e documentação em `docs/LABORATORIO-ESTILO.md` (`tests/styleLab.test.mjs`).
 - **Validação final:** `npm run check` (`tsc --noEmit` + sintaxe) OK, **127/127** testes passando, zero segredos expostos, rotas ao vivo HTTP 200 em `http://100.82.176.70:4173/kit` e `http://100.82.176.70:4173/estilo`.
 - **Falta fazer:** homologação visual no iPhone em `/kit` e `/estilo`; configurar `FAL_KEY` / `GEMINI_API_KEY` (e `STYLE_LAB_ENABLE_VISION=1` quando autorizado orçamento) para testes com IA paga; replicação opcional das regras globais fora do repositório.
+
+## Bloco 3 — auditoria de continuidade (2026-11-27)
+
+- A Constituição e os blocos de AGENTS.md, GEMINI.md e CLAUDE.md foram conferidos na raiz e nos destinos do workspace. A auditoria encontrou 21/21 diretórios completos (84 arquivos no inventário atual).
+- Campanhas Recentes está ativa em `/kit`. A API retornou HTTP 200 via Tailscale e o botão Duplicar Briefing restaurou a marca no navegador. O SQLite de teste recuperou o briefing após reinício do servidor de laboratório.
+- A homologação usa uma pasta isolada por execução em `output/homologacao-*/` e leva a rolagem até o fim da página em cada site testado. A checagem focal do Linktree confirmou 5/5 revelações em 390 px.
+- `npm run check` aprovado e `npm test` com 130/130 testes. A aplicação da alteração no projeto principal segue o fluxo de revisão do worktree.
+- `npm run homologar` aprovado em 84/84 verificações com teaser H.264, fluxo `/estilo → /kit` em 1440 px e 390 px e download dos dois ZIPs.
+
+- Checkpoint automático Assessor Studio (2026-11-28 02:45 UTC).

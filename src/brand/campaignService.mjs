@@ -156,11 +156,11 @@ export function publishedFile(urlRest, { baseDir = PUBLISHED_DIR } = {}) {
   const [slug, ...parts] = urlRest.split('/');
   if (!SLUG_RE.test(slug ?? '')) return null;
   const rel = parts.join('/') || 'index.html';
-  if (!/^(index\.html|styles\.css|logo\.svg|fonts\/[\w.-]+\.woff2)$/.test(rel)) return null;
+  if (!/^(index\.html|styles\.css|logo\.svg|foto-base\.(?:jpg|png)|fonts\/[\w.-]+\.woff2)$/.test(rel)) return null;
   const abs = path.join(baseDir, slug, rel);
   if (!fs.existsSync(abs)) return null;
   const ext = path.extname(rel);
-  const type = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.svg': 'image/svg+xml', '.woff2': 'font/woff2' }[ext];
+  const type = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.svg': 'image/svg+xml', '.woff2': 'font/woff2', '.jpg': 'image/jpeg', '.png': 'image/png' }[ext];
   return { type, data: fs.readFileSync(abs) };
 }
 

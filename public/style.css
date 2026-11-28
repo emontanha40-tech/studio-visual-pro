@@ -106,3 +106,14 @@ textarea.ctl{height:auto;min-height:92px;padding:12px 14px;resize:vertical;line-
 .lab-preset-head h3{margin:0;font-size:16px}
 .lab-mini-swatches{display:flex;gap:6px;margin:12px 0}
 .lab-mini-swatches i{width:24px;height:24px;border-radius:50%;border:1px solid rgba(0,0,0,.15);display:inline-block}
+
+/* ===== Histórico de Lotes (/kit — Campanhas Recentes) ===== */
+.kit-history-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:14px;margin-top:16px}
+.kit-history-card{padding:18px;border:1px solid var(--line);border-radius:12px;background:#fafaf8;display:flex;flex-direction:column;gap:10px;min-width:0}
+.kit-history-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.kit-history-head h3{margin:0;font-size:16px;overflow-wrap:anywhere}
+.kit-history-date{font-size:12px;color:var(--muted);white-space:nowrap}
+.kit-history-title{margin:0;font-size:14px;color:var(--ink);overflow-wrap:anywhere}
+.kit-history-meta{display:flex;flex-wrap:wrap;gap:6px}
+.kit-history-actions{margin:6px 0 0}
+.kit-history-actions .btn{padding:10px 16px;min-height:42px;font-size:13px;text-decoration:none}

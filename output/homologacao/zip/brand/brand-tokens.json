@@ -1,0 +1,43 @@
+{
+  "marca": "Igreja Vida Nova",
+  "id": "custom-ritmo-de-homologacao",
+  "nome": "Ritmo de Homologação",
+  "custom": true,
+  "colors": {
+    "bg": "#0001fe",
+    "surface": "#0001fe",
+    "primary": "#ffffff",
+    "accent": "#0001fe",
+    "secondary": "#0001fe",
+    "success": "#15803d",
+    "text": "#ffffff",
+    "muted": "#ffffff",
+    "onPrimary": "#04060c"
+  },
+  "typography": {
+    "display": "Inter, -apple-system, sans-serif",
+    "body": "Inter, system-ui, sans-serif",
+    "weightDisplay": 800,
+    "tracking": "-0.03em"
+  },
+  "spacing": {
+    "sectionY": "84px",
+    "cardRadius": "18px",
+    "containerMax": "1100px"
+  },
+  "contrast": {
+    "minRatio": 4.5,
+    "mode": "light"
+  },
+  "motion": {
+    "easing": "cubic-bezier(0.16, 1, 0.3, 1)",
+    "durationMs": 380
+  },
+  "teaser": {
+    "avg_scene_seconds": 2,
+    "transition_frames": 6,
+    "pace": "fast",
+    "cut_count": 1,
+    "duration_s": 4
+  }
+}

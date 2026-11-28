@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 56" role="img" aria-label="IGREJA VIDA NOVA">
+  <defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#000000"/><stop offset="100%" stop-color="#0001fe"/></linearGradient></defs>
+  <rect x="4" y="10" width="36" height="36" rx="10" fill="url(#lg)"/>
+  <circle cx="22" cy="28" r="8" fill="#0001fe"/>
+  <circle cx="22" cy="28" r="3.5" fill="#0001fe"/>
+  <text x="52" y="36" fill="#111827" font-family="Inter, -apple-system, sans-serif" font-weight="800" font-size="22" letter-spacing="3">IGREJA VIDA NOVA</text>
+</svg>

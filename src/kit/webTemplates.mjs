@@ -265,7 +265,11 @@ ${constitutionShell({ cta: identity.headlines.cta_principal, whatsapp })}
       b.classList.toggle('is-active', active);
       b.setAttribute('aria-selected', active ? 'true' : 'false');
     });
-    panels.forEach((p) => { p.hidden = p.id !== 'panel-' + id; });
+    panels.forEach((p) => {
+      const show = p.id === 'panel-' + id;
+      p.hidden = !show;
+      if (show) p.querySelectorAll('[data-reveal]').forEach((el) => el.classList.add('is-in'));
+    });
   }));
 })();
 ${CONSTITUTION_JS}

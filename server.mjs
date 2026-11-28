@@ -1,5 +1,6 @@
 import http from 'node:http';
 import { existsSync } from 'node:fs';
+import { randomUUID } from 'node:crypto';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import path from 'node:path';
@@ -9,6 +10,7 @@ import { KIT_PIECES, PRESETS, CATEGORIES } from './src/kit/catalog.mjs';
 import { buildIdentity } from './src/kit/identity.mjs';
 import { buildKit } from './src/kit/batch.mjs';
 import { createTeaserQueue } from './src/kit/teaser.mjs';
+import { openKitHistoryStore, isBatchId, createBatchSlug, publishKitSite } from './src/kit/historyStore.mjs';
 import { fillQuickBrief } from './src/brand/quickBrief.mjs';
 import { generateKit } from './src/brand/kitService.mjs';
 import { openProjectStore, isKitId } from './src/brand/projectStore.mjs';
@@ -123,15 +125,17 @@ function getDefaultQueue() {
 }
 
 /**
- * @param {{ lerAcervo?: typeof carregarAcervo, campaignQueue?: CampaignQueue | null, extraAllowedHosts?: string[], projectStore?: ReturnType<typeof openProjectStore> | null, styleStore?: ReturnType<typeof openStyleStore> | null, kitDeps?: Record<string, any> }} [options]
+ * @param {{ lerAcervo?: typeof carregarAcervo, campaignQueue?: CampaignQueue | null, extraAllowedHosts?: string[], projectStore?: ReturnType<typeof openProjectStore> | null, styleStore?: ReturnType<typeof openStyleStore> | null, kitHistoryStore?: ReturnType<typeof openKitHistoryStore> | null, kitDeps?: Record<string, any> }} [options]
  */
-export function createServer({ lerAcervo = carregarAcervo, campaignQueue = null, extraAllowedHosts = rawExtraHosts, projectStore = null, styleStore = null, kitDeps = {} } = {}) {
+export function createServer({ lerAcervo = carregarAcervo, campaignQueue = null, extraAllowedHosts = rawExtraHosts, projectStore = null, styleStore = null, kitHistoryStore = null, kitDeps = {} } = {}) {
   const teaserQueue = createTeaserQueue(kitDeps.renderTeaser);
   let activeQueue = campaignQueue ?? null;
   let activeStore = projectStore ?? null;
   let activeStyleStore = styleStore ?? null;
+  let activeKitHistoryStore = kitHistoryStore ?? null;
   const getStore = () => activeStore ?? (activeStore = openProjectStore());
   const getStyleStore = () => activeStyleStore ?? (activeStyleStore = openStyleStore());
+  const getKitHistoryStore = () => activeKitHistoryStore ?? (activeKitHistoryStore = openKitHistoryStore());
   const enrichPreset = (payload) => {
     if (!payload || typeof payload !== 'object') return payload;
     delete payload.custom_brand_kit;
@@ -306,18 +310,66 @@ export function createServer({ lerAcervo = carregarAcervo, campaignQueue = null,
 
     if (req.method === 'POST' && pathname === '/api/kit/build') {
       try {
-        const { zip, manifest } = await buildKit(enrichPreset(await readJsonBody(req)), { ...(kitDeps.rasterizer && { rasterizer: kitDeps.rasterizer }), ...(kitDeps.renderTeaser && { teaserRenderer: kitDeps.renderTeaser }), ...(kitDeps.photoResolver && { photoResolver: kitDeps.photoResolver }) });
-        res.writeHead(200, {
+        const rawBody = await readJsonBody(req);
+        const { zip, manifest, identity, publishedSite } = await buildKit(enrichPreset(rawBody), { ...(kitDeps.rasterizer && { rasterizer: kitDeps.rasterizer }), ...(kitDeps.renderTeaser && { teaserRenderer: kitDeps.renderTeaser }), ...(kitDeps.photoResolver && { photoResolver: kitDeps.photoResolver }) });
+        const batchId = `lote-${randomUUID().slice(0, 8)}`;
+        const slug = createBatchSlug(identity.marca, batchId);
+        let liveUrl = null;
+        if (publishedSite) {
+          const pub = publishKitSite(publishedSite, slug, { baseDir: publishDir });
+          liveUrl = pub?.url || null;
+        }
+        const briefingSrc = rawBody?.identidade && typeof rawBody.identidade === 'object' ? rawBody.identidade : rawBody;
+        getKitHistoryStore().saveBatch({
+          id: batchId,
+          slug,
+          marca: identity.marca,
+          titulo: identity.headlines?.principal || briefingSrc?.slogan || identity.marca,
+          modelo: briefingSrc?.modelo || identity.kit?.id || 'tech-cinematografico',
+          liveUrl,
+          piecesCount: manifest.pecas.length,
+          briefing: {
+            marca: briefingSrc?.marca ?? identity.marca,
+            nicho: briefingSrc?.nicho ?? identity.nicho,
+            slogan: briefingSrc?.slogan ?? identity.headlines?.principal ?? '',
+            subtitulo: briefingSrc?.subtitulo ?? identity.headlines?.subtitulo ?? '',
+            data: briefingSrc?.data ?? identity.evento?.data ?? '',
+            local: briefingSrc?.local ?? identity.evento?.local ?? '',
+            modelo: briefingSrc?.modelo ?? identity.kit?.id ?? 'tech-cinematografico',
+          },
+          pieces: manifest.pecas.map((p) => p.id),
+        });
+        const headers = {
           'Content-Type': 'application/zip',
           'Content-Disposition': 'attachment; filename="kit-studio-visual-pro.zip"',
           'X-Kit-Pecas': String(manifest.pecas.length),
+          'X-Kit-Batch-Id': batchId,
           'Cache-Control': 'no-store',
           'X-Content-Type-Options': 'nosniff',
-        });
+        };
+        if (liveUrl) headers['X-Kit-Live-Url'] = liveUrl;
+        res.writeHead(200, headers);
         res.end(zip);
       } catch (err) {
         sendJson(res, 400, { ok: false, erro: err instanceof Error ? err.message : 'Falha ao gerar kit.' });
       }
+      return;
+    }
+
+    const delBatchMatch = /^\/api\/kit\/history\/([a-z0-9-]+)$/.exec(pathname);
+    if (req.method === 'DELETE' && delBatchMatch) {
+      if (req.headers['sec-fetch-site'] === 'cross-site' ||
+          (req.headers.origin && req.headers.origin !== `http://${req.headers.host}` &&
+            req.headers.origin !== `https://${req.headers.host}`)) {
+        sendJson(res, 403, { ok: false, erro: 'Origem não autorizada.' });
+        return;
+      }
+      const id = delBatchMatch[1];
+      if (!isBatchId(id) || !getKitHistoryStore().deleteBatch(id)) {
+        sendJson(res, 404, { ok: false, erro: 'Campanha não encontrada.' });
+        return;
+      }
+      sendJson(res, 200, { ok: true, id });
       return;
     }
 
@@ -545,6 +597,16 @@ export function createServer({ lerAcervo = carregarAcervo, campaignQueue = null,
 
     if (pathname === '/api/kit/catalog') {
       sendJson(res, 200, { categorias: CATEGORIES, pecas: KIT_PIECES, presets: PRESETS });
+      return;
+    }
+
+    if (pathname === '/api/kit/history') {
+      const limit = Number(urlObj.searchParams.get('limit') || 20) || 20;
+      const lotes = getKitHistoryStore().listBatches(limit).map((b) => ({
+        ...b,
+        live_available: Boolean(b.live_url && existsSync(path.join(publishDir, b.slug, 'index.html'))),
+      }));
+      sendJson(res, 200, { ok: true, lotes });
       return;
     }
 
